@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <RelativeLayout
         android:id="@+id/buttons_frame"
         android:layout_width="match_parent"
@@ -21,11 +22,11 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
+            android:fontFamily="@font/montserrat_semibold"
             android:text="@string/app_name"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/montserrat_semibold">
+            android:textStyle="bold">
 
         </TextView>
     </RelativeLayout>
@@ -42,10 +43,13 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="500dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@color/orange"
         android:orientation="vertical"
+        android:layout_margin="15dp"
+        app:layout_constraintWidth_default="spread"
+        app:layout_constraintHeight_default="spread"
         app:layout_constraintBottom_toTopOf="@+id/bottom_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
