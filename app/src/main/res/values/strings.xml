@@ -9,4 +9,12 @@
     <string name="movie_3_genre">Fantastic</string>
     <string name="movie_4">Wizard OZ</string>
     <string name="movie_4_genre">Adventure</string>
+    <string name="button1_name">Menu</string>
+    <string name="button2_name">Favorites</string>
+    <string name="button3_name">Watch Later</string>
+    <string name="button4_name">Collections</string>
+    <string name="button5_name">Settings</string>
+    <string name="movieposter">movieposter</string>
+
+
 </resources>
