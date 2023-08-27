@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.6"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </androidx.constraintlayout.widget.Guideline>
     <TextView
         android:id="@+id/tv_name_movie1"
         android:layout_width="wrap_content"
@@ -28,7 +39,6 @@
         android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttons_frame" />
-
 
     <RelativeLayout
         android:id="@+id/buttons_frame"
@@ -140,7 +150,7 @@
         app:cardElevation="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/main_top_movie3"
         app:layout_constraintDimensionRatio="w,6:9"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/main_top_movie3"
         app:layout_constraintTop_toTopOf="@+id/main_top_movie3">
@@ -156,19 +166,16 @@
 
     <LinearLayout
         android:id="@+id/main_buttons_view_group"
-        android:layout_width="300dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="20dp"
         android:background="@drawable/shape_gradient"
         android:orientation="vertical"
-        android:layout_margin="15dp"
-        app:layout_constraintWidth_default="spread"
-        app:layout_constraintHeight_default="spread"
         app:layout_constraintBottom_toTopOf="@+id/bottom_menu"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_genre_movie1">
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/buttons_frame">
 
 
         <Button
