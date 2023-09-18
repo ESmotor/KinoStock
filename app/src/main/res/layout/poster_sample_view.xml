@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="5dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:stateListAnimator="@animator/grid_poster_click_animator">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/poster_cardView"
+        android:layout_width="0dp"
+        android:layout_height="130dp"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintDimensionRatio="6:9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/poster_imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/poster_imageview"
+            app:srcCompat="@drawable/movie_poster4" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/poster_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/titlemovie"
+        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle2"
+        app:layout_constraintEnd_toEndOf="@+id/poster_cardView"
+        app:layout_constraintStart_toStartOf="@+id/poster_cardView"
+        app:layout_constraintTop_toBottomOf="@+id/poster_cardView" />
+
+    <TextView
+        android:id="@+id/poster_subTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/subtitle_genre"
+        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Caption"
+        app:layout_constraintEnd_toEndOf="@+id/poster_title"
+        app:layout_constraintStart_toStartOf="@+id/poster_title"
+        app:layout_constraintTop_toBottomOf="@+id/poster_title" />
+</androidx.constraintlayout.widget.ConstraintLayout>

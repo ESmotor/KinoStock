@@ -1,20 +1,13 @@
 <resources>
     <string name="app_name">KinoStock</string>
     <string name="main_page.most_popular">Most popular movie</string>
-    <string name="movie_1">Outbreak</string>
-    <string name="movie_1_genre">Action</string>
-    <string name="movie_2">Header</string>
-    <string name="movie_2_genre">Horror</string>
-    <string name="movie_3">Astronaut</string>
-    <string name="movie_3_genre">Fantastic</string>
-    <string name="movie_4">Wizard OZ</string>
-    <string name="movie_4_genre">Adventure</string>
-    <string name="button1_name">Menu</string>
-    <string name="button2_name">Favorites</string>
-    <string name="button3_name">Watch Later</string>
-    <string name="button4_name">Collections</string>
-    <string name="button5_name">Settings</string>
     <string name="movieposter">movieposter</string>
-
-
+    <string name="menu_settings_title">Settings</string>
+    <string name="menu_favorites_title">Favorites</string>
+    <string name="menu_watchLater_title">Watch Later</string>
+    <string name="menu_videoCollection_title">Collections</string>
+    <string name="page_title" translatable="false">Juranimo!</string>
+    <string name="poster_imageview" translatable="false">poster_imageview</string>
+    <string name="titlemovie" translatable="false">TitleMovie</string>
+    <string name="subtitle_genre" translatable="false">subTitle</string>
 </resources>

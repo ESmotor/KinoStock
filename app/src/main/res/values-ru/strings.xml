@@ -1,20 +1,11 @@
 <resources>
     <string name="app_name">KinoStock</string>
     <string name="main_page.most_popular">Самые популярные</string>
-    <string name="movie_1">Outbreak</string>
-    <string name="movie_1_genre">Боевик</string>
-    <string name="movie_2">Header</string>
-    <string name="movie_2_genre">Ужасы</string>
-    <string name="movie_3">Astronaut</string>
-    <string name="movie_3_genre">Фантастика</string>
-    <string name="movie_4">Wizard OZ</string>
-    <string name="movie_4_genre">Приключение</string>
-    <string name="button1_name">Меню</string>
-    <string name="button2_name">Избранное</string>
-    <string name="button3_name">Посмотреть позже</string>
-    <string name="button4_name">Коллекция</string>
-    <string name="button5_name">Настройки</string>
     <string name="movieposter">movieposter</string>
+    <string name="menu_settings_title">Настройки</string>
+    <string name="menu_favorites_title">Избранное</string>
+    <string name="menu_watchLater_title">Посмотреть позже</string>
+    <string name="menu_videoCollection_title">Коллекции</string>
 
 
 </resources>
