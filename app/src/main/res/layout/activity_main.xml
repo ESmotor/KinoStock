@@ -55,7 +55,131 @@
         android:layout_marginEnd="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_mostpopular" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_mostpopular"/>
+
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/grid_posters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layoutAnimation="@anim/grid_animation"
+        app:columnCount="3"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rv_poster"
+        app:orientation="horizontal"
+        app:useDefaultMargins="true">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster1"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_1" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster2"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_2" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster3"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_3" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster4"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_4" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster5"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_5" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_grid_poster6"
+            android:layout_width="110dp"
+            android:layout_height="165dp"
+            android:clickable="true"
+            android:elevation="10dp"
+            android:focusable="true"
+            android:stateListAnimator="@animator/grid_poster_click_animator"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/im_grid_poster6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/poster_grid_6" />
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.gridlayout.widget.GridLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
