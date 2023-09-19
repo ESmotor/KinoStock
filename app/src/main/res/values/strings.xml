@@ -8,17 +8,20 @@
     <string name="subtitle_genre" translatable="false">subTitle</string>
 
 
-<!--    BottomApp_Menu-->
+    <!--    BottomApp_Menu-->
     <string name="bottom_app_bar_favorites">Favorites</string>
     <string name="bottom_app_bar_watch_later">Watch Later</string>
     <string name="bottom_app_bar_video_collection">Collections</string>
 
+    <!--Movie sample item view -->
+    <string name="movie_content_description" translatable="false">image movie in the list</string>
+    <string name="release_year" translatable="false">Release year:</string>
+    <string name="rating_imdb" translatable="false">Rating IMDb:</string>
+    <string name="lorem_description" translatable="false">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.</string>
 
 
-
-<!--TopApp_Menu-->
+    <!--TopApp_Menu-->
     <string name="top_app_bar_settings">Settings</string>
-
 
 
 </resources>
