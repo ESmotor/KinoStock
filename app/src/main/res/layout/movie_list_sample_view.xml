@@ -12,6 +12,9 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="2dp"
         android:backgroundTint="?attr/colorSurfaceVariant"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

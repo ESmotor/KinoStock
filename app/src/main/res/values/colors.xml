@@ -5,6 +5,8 @@
     <color name="orange">#FF9800</color>
     <color name="blue">#0008ff</color>
     <color name="red">#ff0000</color>
+    <color name="colorAccent">#852F83</color>
+    <color name="holo_red_dark">#B80101</color>
     <color name="sky_blue">#00ddff</color>
     <color name="grey">#FF7E7E7E</color>
 

@@ -1,5 +1,7 @@
-package com.itskidan.kinostock
-
+package com.itskidan.kinostock.module
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+@Parcelize
 data class Movie(
     val id: Int,
     val imagePoster: Int,
@@ -7,5 +9,4 @@ data class Movie(
     val releaseYear: Int,
     val description: String,
     val rating: Double
-) {
-}
+) : Parcelable

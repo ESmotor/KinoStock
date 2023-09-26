@@ -50,17 +50,9 @@
 
     <!--    Top toolbar Style Coloder-->
     <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
         <item name="titleTextAppearance">@style/TextAppearance.MdcTypographyStyles.Headline6</item>
         <item name="subtitleTextAppearance">@style/TextAppearance.MdcTypographyStyles.Subtitle1</item>
     </style>
-
-    <style name="ThemeOverlay.App.Toolbar" parent="">
-        <item name="colorPrimary">@color/md_theme_dark_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
-<!--        <item name="colorPrimaryVariant">#2F0037</item>-->
-    </style>
-
 
 
 </resources>

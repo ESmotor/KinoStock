@@ -1,8 +1,6 @@
-package com.itskidan.kinostock
+package com.itskidan.kinostock.module
 
-import android.widget.ImageView
-
-data class MoviePoster(
+data class Poster(
     val id:Int,
     val imageId: Int,
     val title: String,

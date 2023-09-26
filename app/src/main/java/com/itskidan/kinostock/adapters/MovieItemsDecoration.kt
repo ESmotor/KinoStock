@@ -1,4 +1,4 @@
-package com.itskidan.kinostock
+package com.itskidan.kinostock.adapters
 
 import android.content.res.Resources
 import android.graphics.Rect

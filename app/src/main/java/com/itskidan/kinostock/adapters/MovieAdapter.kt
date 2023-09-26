@@ -1,14 +1,16 @@
-package com.itskidan.kinostock
+package com.itskidan.kinostock.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.MovieListSampleViewBinding
+import com.itskidan.kinostock.module.Movie
 
-class MovieListAdapter(private val clickListener: OnItemClickListener) :
-    RecyclerView.Adapter<MovieListAdapter.MovieViewHolder>() {
-    private val movieList = ArrayList<Movie>()
+class MovieAdapter(private val clickListener: OnItemClickListener) :
+    RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+    var data = ArrayList<Movie>()
 
     class MovieViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = MovieListSampleViewBinding.bind(item)
@@ -29,30 +31,33 @@ class MovieListAdapter(private val clickListener: OnItemClickListener) :
     }
 
     override fun getItemCount(): Int {
-        return movieList.size
+        return data.size
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        holder.bindSample(movieList[position])
+        holder.bindSample(data[position])
+        holder.binding.cardViewMainBg.setOnClickListener {
+            clickListener.click(data[position])
+        }
     }
 
     fun addLastMovie(movie: Movie) {
-        movieList.add(movie)
-        val position = movieList.size - 1
+        data.add(movie)
+        val position = data.size - 1
         notifyItemInserted(position)
     }
+
     fun addAllMovies(data: ArrayList<Movie>) {
-        movieList.clear()
-        movieList.addAll(data)
+        this.data.clear()
+        this.data.addAll(data)
         notifyDataSetChanged()
     }
-
 
 
     //Interface for processing clicks
 
     interface OnItemClickListener {
-        fun click(movie: Movie, position: Int)
+        fun click(movie: Movie)
     }
 
 }

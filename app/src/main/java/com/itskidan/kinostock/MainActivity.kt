@@ -1,21 +1,41 @@
 package com.itskidan.kinostock
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.itskidan.kinostock.adapters.DiffMovieAdapter
+import com.itskidan.kinostock.adapters.MovieAdapter
+import com.itskidan.kinostock.adapters.MovieItemsDecoration
+import com.itskidan.kinostock.adapters.PosterAdapter
 import com.itskidan.kinostock.databinding.ActivityMainBinding
+import com.itskidan.kinostock.module.Movie
+import com.itskidan.kinostock.module.Poster
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-
+    private var launcher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //Let's register our transition to a new activity and define a callback for the future, in case it comes in handy
+        launcher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                if (result.resultCode == RESULT_OK) {
+                    val data = result.data?.getStringExtra("key")
+                }
+            }
 
         //TopAppBar Settings
         topAppBarClickListener()
@@ -25,8 +45,13 @@ class MainActivity : AppCompatActivity() {
 
         //Movie List Recycler View
         //create main Movie Adapter with click listener on items
-        val movieAdapter = MovieListAdapter(object : MovieListAdapter.OnItemClickListener {
-            override fun click(movie: Movie, position: Int) {
+        val movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
+            override fun click(movie: Movie) {
+                val bundle = Bundle()
+                bundle.putParcelable("movie", movie)
+                val intent = Intent(this@MainActivity, DetailMovieActivity::class.java)
+                intent.putExtras(bundle)
+                launcher?.launch(intent)
             }
         })
         // create LayoutManager
@@ -34,16 +59,23 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
         // create ItemDecoration for offset
         val movieItemsDecoration = MovieItemsDecoration(8)
-
         //setup Movie Adapter to our Recycler view
         binding.rvMoovieList.apply {
             this?.adapter = movieAdapter
             this?.layoutManager = layoutManagerMovie
             this?.addItemDecoration(movieItemsDecoration)
         }
+        //update data with DiffUtil
+        fun updateDiffDataMovie(newData: ArrayList<Movie>) {
+            val oldData = movieAdapter.data
+            val movieDiff = DiffMovieAdapter(oldData, newData)
+            val diffResult = DiffUtil.calculateDiff(movieDiff)
+            movieAdapter.data = newData
+            diffResult.dispatchUpdatesTo(movieAdapter)
+        }
         // add some data to Recycler view
         val dataMovie = movieData()
-        movieAdapter.addAllMovies(dataMovie)
+        updateDiffDataMovie(dataMovie)
 
         // Top Posters Recycler View
         //create Poster Adapter
@@ -116,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             val index = it % imageIdList.size
             val movie =
                 Movie(
-                    (1..10).random() * it,
+                    (10000..99999).random() * (1 + it),
                     imageIdList[index],
                     titleList[index],
                     2023,
@@ -131,12 +163,12 @@ class MainActivity : AppCompatActivity() {
         return resultList
     }
 
-    private fun posterData(): ArrayList<MoviePoster> {
-        val resultList = ArrayList<MoviePoster>()
+    private fun posterData(): ArrayList<Poster> {
+        val resultList = ArrayList<Poster>()
         repeat(10) {
             val index = it % imageIdList.size
-            val poster = MoviePoster(
-                (1000..9999).random() * it,
+            val poster = Poster(
+                (1000..9999).random() * (it + 1),
                 imageIdList[index],
                 titleList[index],
                 subtitleList[index]
