@@ -71,5 +71,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rv_poster" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
