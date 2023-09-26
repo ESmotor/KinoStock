@@ -2,10 +2,10 @@
     <string name="app_name">KinoStock</string>
     <string name="main_page.most_popular">Самые популярные</string>
     <string name="movieposter">movieposter</string>
-    <string name="menu_settings_title">Настройки</string>
-    <string name="menu_favorites_title">Избранное</string>
-    <string name="menu_watchLater_title">Посмотреть позже</string>
-    <string name="menu_videoCollection_title">Коллекции</string>
+    <string name="top_app_bar_settings">Настройки</string>
+    <string name="bottom_app_bar_favorites">Избранное</string>
+    <string name="bottom_app_bar_watch_later">Посмотреть позже</string>
+    <string name="bottom_app_bar_video_collection">Коллекции</string>
 
 
 </resources>

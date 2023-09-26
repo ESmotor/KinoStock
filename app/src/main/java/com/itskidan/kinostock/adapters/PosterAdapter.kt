@@ -1,21 +1,20 @@
-package com.itskidan.kinostock
+package com.itskidan.kinostock.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
+import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.PosterSampleViewBinding
+import com.itskidan.kinostock.module.Poster
 
 class PosterAdapter : RecyclerView.Adapter<PosterAdapter.PosterViewHolder>() {
-    private val posterList = ArrayList<MoviePoster>()
+    val data = ArrayList<Poster>()
 
     class PosterViewHolder(item: View) : RecyclerView.ViewHolder(item) {
-
-
         private val binding = PosterSampleViewBinding.bind(item)
 
-        fun bindSample(poster: MoviePoster) = with(binding) {
+        fun bindSample(poster: Poster) = with(binding) {
             posterImageView.setImageResource(poster.imageId)
             posterTitle.text = poster.title
             posterSubTitle.text = poster.subTilte
@@ -29,15 +28,22 @@ class PosterAdapter : RecyclerView.Adapter<PosterAdapter.PosterViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return posterList.size
+        return data.size
     }
 
     override fun onBindViewHolder(holder: PosterViewHolder, position: Int) {
-        holder.bindSample(posterList[position])
+        holder.bindSample(data[position])
     }
 
-    fun addPost(post: MoviePoster) {
-        posterList.add(post)
+    fun addLastPoster(post: Poster) {
+        data.add(post)
+        val position = data.size - 1
+        notifyItemInserted(position)
+    }
+
+    fun addAllPoster(data: ArrayList<Poster>) {
+        this.data.clear()
+        this.data.addAll(data)
         notifyDataSetChanged()
     }
 

@@ -3,17 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/favorites"
-        android:icon="@drawable/round_favorite"
-        android:title="@string/menu_favorites_title"
+        android:icon="@drawable/ic_round_favorite_24"
+        android:title="@string/bottom_app_bar_favorites"
         app:showAsAction="withText" />
     <item
         android:id="@+id/watch_later"
-        android:icon="@drawable/round_watch_later"
-        android:title="@string/menu_watchLater_title"
+        android:icon="@drawable/ic_round_watch_later_24"
+        android:title="@string/bottom_app_bar_watch_later"
         app:showAsAction="withText" />
     <item
         android:id="@+id/collection"
-        android:icon="@drawable/round_video_collection"
-        android:title="@string/menu_videoCollection_title"
+        android:icon="@drawable/ic_round_video_collection_24"
+        android:title="@string/bottom_app_bar_video_collection"
         app:showAsAction="withText" />
+
 </menu>
