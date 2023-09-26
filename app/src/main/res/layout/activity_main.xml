@@ -47,7 +47,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar_layout" />
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_poster"
         android:layout_width="0dp"
