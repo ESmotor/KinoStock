@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -36,39 +37,16 @@
             app:titleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Headline5" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <TextView
-        android:id="@+id/tv_mostpopular"
-        style="@style/TextAppearance.MdcTypographyStyles.Headline6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/main_page.most_popular"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar_layout" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_poster"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_mostpopular" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_moovie_list"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/fragmentContainerMain"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rv_poster" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
+        tools:background="@android:color/holo_blue_light">
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

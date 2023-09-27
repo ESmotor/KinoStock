@@ -12,7 +12,6 @@
     <string name="error_title" translatable="false">Some Error</string>
 
 
-
     <!--    BottomApp_Menu-->
     <string name="bottom_app_bar_favorites">Favorites</string>
     <string name="bottom_app_bar_watch_later">Watch Later</string>
@@ -28,7 +27,14 @@
     <!--TopApp_Menu-->
     <string name="top_app_bar_settings">Settings</string>
     <string name="lorem" translatable="false">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur</string>
-    <string name="share_action">share action</string>
+    <string name="share_action" translatable="false">share action</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 
+    <!--Alert_Dialogs-->
+    <string name="dialog_title" translatable="false">Exit</string>
+    <string name="dialog_supporting_text" translatable="false">Are you sure you want to exit the application?</string>
+    <string name="dialog_cancel" translatable="false">Cancel</string>
+    <string name="dialog_decline" translatable="false">Decline</string>
+    <string name="dialog_accept" translatable="false">Accept</string>
 
 </resources>
