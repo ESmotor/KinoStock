@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,10 +20,13 @@ import com.itskidan.kinostock.module.Movie
 import com.itskidan.kinostock.module.Poster
 import com.itskidan.kinostock.viewModel.DataModel
 
-
 class MainFragment : Fragment() {
+
     private lateinit var binding: FragmentMainBinding
     private val dataModel: DataModel by activityViewModels()
+    lateinit var movieAdapter: MovieAdapter
+    lateinit var currentMovieList: ArrayList<Movie>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,13 +39,19 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dataModel.actualMovieList.observe(activity as LifecycleOwner) { movieList ->
+            currentMovieList = movieList
+            updateDiffDataMovie(currentMovieList)
+        }
+
         //Movie List Recycler View
         //create main Movie Adapter with click listener on items
-        val movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
-            override fun click(movie: Movie) {
+        movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
+            override fun click(movie: Movie, position: Int) {
                 //reaction to a click on a Recycler View element
-                dataModel.dataMainFragToDetailFrag.value = movie
-                addFragment(DetailFragment(), R.id.fragmentContainerMain)
+                dataModel.mainToDetailFragMovie.value = movie
+                dataModel.mainToDetailFragPosition.value = position
+                addFragment(DetailFragment(),Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
             }
         })
 
@@ -56,17 +66,6 @@ class MainFragment : Fragment() {
             this.layoutManager = layoutManagerMovie
             this.addItemDecoration(movieItemsDecoration)
         }
-        //update data with DiffUtil
-        fun updateDiffDataMovie(newData: ArrayList<Movie>) {
-            val oldData = movieAdapter.data
-            val movieDiff = DiffMovieAdapter(oldData, newData)
-            val diffResult = DiffUtil.calculateDiff(movieDiff)
-            movieAdapter.data = newData
-            diffResult.dispatchUpdatesTo(movieAdapter)
-        }
-        // add some data to Recycler view
-        val dataMovie = movieData()
-        updateDiffDataMovie(dataMovie)
 
         // Top Posters Recycler View
         //create Poster Adapter
@@ -85,25 +84,13 @@ class MainFragment : Fragment() {
 
     }
 
-    private fun movieData(): ArrayList<Movie> {
-        val resultList = ArrayList<Movie>()
-        repeat(20) {
-            val index = it % imageIdList.size
-            val movie =
-                Movie(
-                    (10000..99999).random() * (1 + it),
-                    imageIdList[index],
-                    titleList[index],
-                    2023,
-                    "It is a long established fact that a reader will be distracted " +
-                            "by the readable content of a page when looking at its layout. " +
-                            "The point of using Lorem Ipsum is that it has a more-or-less " +
-                            "normal distribution of letters, as opposed to using.",
-                    6.5
-                )
-            resultList.add(movie)
-        }
-        return resultList
+    //update data with DiffUtil
+    fun updateDiffDataMovie(newData: ArrayList<Movie>) {
+        val oldData = movieAdapter.data
+        val movieDiff = DiffMovieAdapter(oldData, newData)
+        val diffResult = DiffUtil.calculateDiff(movieDiff)
+        movieAdapter.data = newData
+        diffResult.dispatchUpdatesTo(movieAdapter)
     }
 
     private fun posterData(): ArrayList<Poster> {
@@ -121,8 +108,7 @@ class MainFragment : Fragment() {
         return resultList
     }
 
-    private fun addFragment(fragment: Fragment, container: Int) {
-        val tag = "detailFragment"
+    private fun addFragment(fragment: Fragment,tag:String, container: Int) {
         val activity = requireActivity()
         val toolbar = activity.findViewById<MaterialToolbar>(R.id.topAppBar)
         toolbar.visibility = View.GONE
@@ -131,25 +117,25 @@ class MainFragment : Fragment() {
             .replace(container, fragment, tag)
             .addToBackStack(tag)
             .commit()
-        if (fragment !is MainFragment){
+        if (fragment !is MainFragment) {
             toolbar.visibility = View.GONE
         }
     }
 
     companion object {
-        private val imageIdList = listOf(
+        val imageIdList = listOf(
             R.drawable.movie_poster1,
             R.drawable.movie_poster2,
             R.drawable.movie_poster3,
             R.drawable.movie_poster4
         )
-        private val titleList = listOf(
+        val titleList = listOf(
             "Outbreak",
             "Header",
             "Astronaut",
             "Wizard OZ"
         )
-        private val subtitleList = listOf(
+        val subtitleList = listOf(
             "Action",
             "Horror",
             "Fantastic",

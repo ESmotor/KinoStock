@@ -26,6 +26,7 @@ class DiffMovieAdapter(
                 oldMovie.title == newMovie.title &&
                 oldMovie.releaseYear == newMovie.releaseYear &&
                 oldMovie.description == newMovie.description &&
-                oldMovie.rating == newMovie.rating
+                oldMovie.rating == newMovie.rating &&
+                oldMovie.isFavorite == newMovie.isFavorite
     }
 }

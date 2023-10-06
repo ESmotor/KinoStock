@@ -36,5 +36,6 @@
     <string name="dialog_cancel" translatable="false">Cancel</string>
     <string name="dialog_decline" translatable="false">Decline</string>
     <string name="dialog_accept" translatable="false">Accept</string>
+    <string name="your_favorites_movies">Your favorites movies</string>
 
 </resources>
