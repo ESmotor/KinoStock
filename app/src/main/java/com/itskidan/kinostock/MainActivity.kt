@@ -91,9 +91,7 @@ class MainActivity : AppCompatActivity() {
                 is DetailFragment -> {
 
                 }
-
             }
-
         }
     }
 
