@@ -1,202 +1,141 @@
 package com.itskidan.kinostock
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.itskidan.kinostock.adapters.DiffMovieAdapter
-import com.itskidan.kinostock.adapters.MovieAdapter
-import com.itskidan.kinostock.adapters.MovieItemsDecoration
-import com.itskidan.kinostock.adapters.PosterAdapter
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.databinding.ActivityMainBinding
 import com.itskidan.kinostock.module.Movie
-import com.itskidan.kinostock.module.Poster
+import com.itskidan.kinostock.viewModel.DataModel
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var launcher: ActivityResultLauncher<Intent>? = null
-
+    var currentMoviePos: Int? = null
+    var currentMovie: Movie? = null
+    lateinit var currentMovieList: ArrayList<Movie>
+    private val dataModel: DataModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //Let's register our transition to a new activity and define a callback for the future, in case it comes in handy
-        launcher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-                if (result.resultCode == RESULT_OK) {
-                    val data = result.data?.getStringExtra("key")
-                }
-            }
-
-        //TopAppBar Settings
-        topAppBarClickListener()
-
-        //Bottom Navigation Menu Settings
-        bottomAppBarClickListener()
-
-        //Movie List Recycler View
-        //create main Movie Adapter with click listener on items
-        val movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
-            override fun click(movie: Movie) {
-                val bundle = Bundle()
-                bundle.putParcelable("movie", movie)
-                val intent = Intent(this@MainActivity, DetailMovieActivity::class.java)
-                intent.putExtras(bundle)
-                launcher?.launch(intent)
-            }
-        })
-        // create LayoutManager
-        val layoutManagerMovie =
-            LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
-        // create ItemDecoration for offset
-        val movieItemsDecoration = MovieItemsDecoration(8)
-        //setup Movie Adapter to our Recycler view
-        binding.rvMoovieList.apply {
-            this?.adapter = movieAdapter
-            this?.layoutManager = layoutManagerMovie
-            this?.addItemDecoration(movieItemsDecoration)
-        }
-        //update data with DiffUtil
-        fun updateDiffDataMovie(newData: ArrayList<Movie>) {
-            val oldData = movieAdapter.data
-            val movieDiff = DiffMovieAdapter(oldData, newData)
-            val diffResult = DiffUtil.calculateDiff(movieDiff)
-            movieAdapter.data = newData
-            diffResult.dispatchUpdatesTo(movieAdapter)
-        }
+        //put the observer in the activity we need
+        lifecycle.addObserver(App.instance.lifecycleObserver)
+        //Monitoring changes in variables in the DataModel class
+        dataModelObserving()
         // add some data to Recycler view
         val dataMovie = movieData()
-        updateDiffDataMovie(dataMovie)
-
-        // Top Posters Recycler View
-        //create Poster Adapter
-        val posterAdapter = PosterAdapter()
-        // create LayoutManager
-        val layoutManagerPoster =
-            LinearLayoutManager(this@MainActivity, RecyclerView.HORIZONTAL, false)
-        //setup Movie Adapter to our Recycler view
-        binding.rvPoster.apply {
-            this?.adapter = posterAdapter
-            this?.layoutManager = layoutManagerPoster
-        }
-        // add some data to Recycler view
-        val dataPoster = posterData()
-        posterAdapter.addAllPoster(dataPoster)
-
+        dataModel.actualMovieList.value = dataMovie
+        //add starting fragment
+        addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
+        //setup fragments manager and settings
+        fragmentManagerSetup()
     }
 
 
-    private fun bottomAppBarClickListener() {
-        binding.bottomNavigation?.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.favorites -> {
-                    showToastMsg("Favorites")
-                    true
+    override fun onBackPressed() {
+        super.onBackPressed()
+        //depending on which fragment in the stack we show the corresponding toolbar
+        val backStackCount = supportFragmentManager.backStackEntryCount
+        if (backStackCount < 1) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(resources.getString(R.string.dialog_title))
+                .setMessage(resources.getString(R.string.dialog_supporting_text))
+                .setNeutralButton(resources.getString(R.string.dialog_cancel)) { dialog, which ->
+                    // Respond to neutral button press
+                    addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
+                    Snackbar.make(
+                        binding.fragmentContainerMain,
+                        "Welcome Again",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+                .setNegativeButton(resources.getString(R.string.dialog_decline)) { dialog, which ->
+                    // Respond to negative button press
+                    addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
+                    Snackbar.make(
+                        binding.fragmentContainerMain,
+                        "We're glad you're back",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+                .setPositiveButton(resources.getString(R.string.dialog_accept)) { dialog, which ->
+                    // Respond to positive button press
+                    finish()
+                }
+                .show()
+        }
+
+    }
+
+    private fun fragmentManagerSetup() {
+        supportFragmentManager.addOnBackStackChangedListener {
+            // In this block we will perform actions when changing the stack of fragments
+            when (supportFragmentManager.findFragmentById(R.id.fragmentContainerMain)) {
+                is MainFragment -> {
+                    val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+                    val homeItem = botNavView.menu.findItem(R.id.home)
+                    homeItem.isChecked = true
                 }
 
-                R.id.watch_later -> {
-                    showToastMsg("Watch Later")
-                    true
+                is FavoriteFragment -> {
+                    val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+                    val favoriteItem = botNavView.menu.findItem(R.id.favorites)
+                    favoriteItem.isChecked = true
                 }
 
-                R.id.collection -> {
-                    showToastMsg("Film collection")
-                    true
+                is DetailFragment -> {
+
                 }
 
-                else -> false
             }
+
         }
     }
 
-    private fun topAppBarClickListener() {
-        with(binding) {
-            topAppBar?.setNavigationOnClickListener {
-                showToastMsg("Navigation menu")
-            }
-            topAppBar?.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.settings -> {
-                        showToastMsg("Settings")
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-
-        }
-    }
-
-    // Support Functions for init data and Toast
-    private fun showToastMsg(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    private fun addFragment(fragment: Fragment, tag: String, container: Int) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(container, fragment, tag)
+            .addToBackStack(tag)
+            .commit()
     }
 
     private fun movieData(): ArrayList<Movie> {
         val resultList = ArrayList<Movie>()
-        repeat(20) {
-            val index = it % imageIdList.size
+        repeat(9) {
+            val index = it % MainFragment.imageIdList.size
             val movie =
                 Movie(
                     (10000..99999).random() * (1 + it),
-                    imageIdList[index],
-                    titleList[index],
+                    MainFragment.imageIdList[index],
+                    MainFragment.titleList[index],
                     2023,
                     "It is a long established fact that a reader will be distracted " +
                             "by the readable content of a page when looking at its layout. " +
                             "The point of using Lorem Ipsum is that it has a more-or-less " +
                             "normal distribution of letters, as opposed to using.",
-                    6.5
+                    6.5,
+                    it % 3 == 0
                 )
             resultList.add(movie)
         }
         return resultList
     }
 
-    private fun posterData(): ArrayList<Poster> {
-        val resultList = ArrayList<Poster>()
-        repeat(10) {
-            val index = it % imageIdList.size
-            val poster = Poster(
-                (1000..9999).random() * (it + 1),
-                imageIdList[index],
-                titleList[index],
-                subtitleList[index]
-            )
-            resultList.add(poster)
+    private fun dataModelObserving() {
+        dataModel.mainToDetailFragPosition.observe(this@MainActivity) { position ->
+            currentMoviePos = position
         }
-        return resultList
-    }
-
-
-    companion object {
-        private val imageIdList = listOf(
-            R.drawable.movie_poster1,
-            R.drawable.movie_poster2,
-            R.drawable.movie_poster3,
-            R.drawable.movie_poster4
-        )
-        private val titleList = listOf(
-            "Outbreak",
-            "Header",
-            "Astronaut",
-            "Wizard OZ"
-        )
-        private val subtitleList = listOf(
-            "Action",
-            "Horror",
-            "Fantastic",
-            "Cartoon"
-        )
+        dataModel.mainToDetailFragMovie.observe(this@MainActivity) { movie ->
+            currentMovie = movie
+        }
+        dataModel.actualMovieList.observe(this@MainActivity) { movieList ->
+            currentMovieList = movieList
+        }
     }
 }

@@ -48,11 +48,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
-                tools:text="Centaur"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imageFavorite"
                 app:layout_constraintStart_toEndOf="@+id/card_view_image_bg"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Centaur" />
 
             <TextView
                 android:id="@+id/release_year_text"
@@ -112,6 +112,16 @@
                 app:layout_constraintBottom_toBottomOf="@+id/rating_text"
                 app:layout_constraintStart_toEndOf="@+id/rating_text"
                 app:layout_constraintTop_toTopOf="@+id/rating_text" />
+
+            <ImageView
+                android:id="@+id/imageFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_favorite_border_24" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
