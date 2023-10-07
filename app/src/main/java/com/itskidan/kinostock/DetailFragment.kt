@@ -1,5 +1,6 @@
 package com.itskidan.kinostock
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -26,9 +27,11 @@ class DetailFragment : Fragment() {
     private lateinit var binding: FragmentDetailBinding
     private val dataModel: DataModel by activityViewModels()
     private var isOpen: Boolean = false
-    private var currentMovie: Movie? = null
-    private var currentMoviePos: Int? = null
-    private var currentMovieList: ArrayList<Movie>? = null
+
+    lateinit var currentMovieList: ArrayList<Movie>
+    var currentMovie: Movie? = null
+    var currentMoviePos: Int? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,50 +44,40 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: android.view.View, savedInstanceState: android.os.Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Observing variables that may change
-        dataModel.mainToDetailFragPosition.observe(activity as LifecycleOwner) { position ->
-            currentMoviePos = position
+        //TopAppBar Setup
+        setUpAppBarLayout()
+        //Share floating bar click listener
+        binding.fabShare.setOnClickListener {
+            onShareClick()
         }
-        dataModel.actualMovieList.observe(activity as LifecycleOwner) { movieList ->
-            currentMovieList = movieList
+        //Favorite floating bar click listener
+        binding.fabFav.setOnClickListener {
+            onFavoriteClick()
         }
-        dataModel.mainToDetailFragMovie.observe(activity as LifecycleOwner) { movie ->
-            //if the variable is not null, then we process its parameters in the way we need
-            if (movie != null) {
-                currentMovie = movie
-                binding.collapsingToolbarLayout.title = movie.title
-                binding.imageMovie.setImageResource(R.drawable.transformers)
-                binding.tvMovieDescription.text = movie.description
-                binding.tvMovieReleasedYear.text = movie.releaseYear.toString()
-            } else {
-                binding.collapsingToolbarLayout.title = getString(R.string.error_title)
-                binding.imageMovie.setImageResource(R.drawable.error)
-                binding.tvMovieDescription.text = getString(R.string.error_description)
-            }
-            setUpAppBarLayout()
-        }
+        //Observing requires data
+        dataModelObserving()
+    }
 
+
+    private fun setUpAppBarLayout() {
         //setup toolbar
         val toolbar = binding.toolbar
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
-
         //TopAppBar Settings and click listener
-        with(binding) {
-            toolbar.setNavigationOnClickListener {
-                Snackbar.make(binding.detailLayout, "Back to main page", Snackbar.LENGTH_SHORT)
-                    .show()
-            }
+        toolbar.setNavigationOnClickListener {
+            Snackbar.make(binding.detailLayout, "Back to main page", Snackbar.LENGTH_SHORT)
+                .show()
         }
 
-        //Share floating bar click listener
-        binding.fabShare.setOnClickListener {
-            Snackbar.make(binding.detailLayout, "Share button", Snackbar.LENGTH_SHORT).show()
-        }
-        //Share floating bar click listener
-        binding.fabFav.setOnClickListener {
-            onFavoriteClick()
-        }
+        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange.toFloat()
+            val percentage = abs(verticalOffset.toFloat())
+            val favBtn = binding.toolbar.menu.findItem(R.id.isFavorite)
+            val shareBtn = binding.toolbar.menu.findItem(R.id.share)
+            favBtn?.isVisible = (totalScrollRange == percentage)
+            shareBtn?.isVisible = (totalScrollRange == percentage)
+        })
 
         // install menu to our toolbar
         val menuHost: MenuHost = requireActivity()
@@ -114,6 +107,11 @@ class DetailFragment : Fragment() {
                         true
                     }
 
+                    R.id.share -> {
+                        onShareClick()
+                        true
+                    }
+
                     else -> false
                 }
             }
@@ -121,21 +119,6 @@ class DetailFragment : Fragment() {
 
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-    }
-
-
-    private fun setUpAppBarLayout() {
-
-        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange.toFloat()
-            val percentage = abs(verticalOffset.toFloat())
-            val favBtn = binding.toolbar.menu.findItem(R.id.isFavorite)
-            val shareBtn = binding.toolbar.menu.findItem(R.id.share)
-            favBtn.isVisible = (totalScrollRange == percentage)
-            shareBtn.isVisible = (totalScrollRange == percentage)
-            binding.pos1.text = isOpen.toString()
-            binding.pos2.text = percentage.toString()
-        })
     }
 
     private fun onFavoriteClick() {
@@ -152,11 +135,52 @@ class DetailFragment : Fragment() {
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
         }
 
-        currentMovieList?.set(currentMoviePos!!, currentMovie!!)
+        currentMovieList[currentMoviePos!!] = currentMovie!!
 
         dataModel.mainToDetailFragMovie.value = currentMovie
         dataModel.mainToDetailFragPosition.value = currentMoviePos
         dataModel.actualMovieList.value = currentMovieList
 
     }
+
+    private fun onShareClick() {
+        //Create an intent
+        val intent = Intent()
+        //Specify the action with which it is launched
+        intent.action = Intent.ACTION_SEND
+        //Put data about our movie
+        intent.putExtra(
+            Intent.EXTRA_TEXT,
+            "Check out this film: ${currentMovie?.title} \n\n ${currentMovie?.description}"
+        )
+        //Specify the MIME type so that the system knows which application to offer
+        intent.type = "text/plain"
+        //Launch our activity
+        startActivity(Intent.createChooser(intent, "Share To:"))
+    }
+
+    private fun dataModelObserving() {
+        dataModel.mainToDetailFragPosition.observe(activity as LifecycleOwner) { position ->
+            currentMoviePos = position
+        }
+        dataModel.mainToDetailFragMovie.observe(activity as LifecycleOwner) { movie ->
+            currentMovie = movie
+            //if the variable is not null, then we process its parameters in the way we need
+            if (movie != null) {
+                currentMovie = movie
+                binding.collapsingToolbarLayout.title = movie.title
+                binding.imageMovie.setImageResource(R.drawable.transformers)
+                binding.tvMovieDescription.text = movie.description
+                binding.tvMovieReleasedYear.text = movie.releaseYear.toString()
+            } else {
+                binding.collapsingToolbarLayout.title = getString(R.string.error_title)
+                binding.imageMovie.setImageResource(R.drawable.error)
+                binding.tvMovieDescription.text = getString(R.string.error_description)
+            }
+        }
+        dataModel.actualMovieList.observe(activity as LifecycleOwner) { movieList ->
+            currentMovieList = movieList
+        }
+    }
+
 }

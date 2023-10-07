@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/share"
-        android:title="PutFavorite"
+        android:title="Share"
         android:icon="@drawable/ic_round_share_24"
         android:iconTint="?attr/colorOnPrimary"
         app:showAsAction="ifRoom" />

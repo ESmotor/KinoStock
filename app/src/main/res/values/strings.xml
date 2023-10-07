@@ -16,6 +16,7 @@
     <string name="bottom_app_bar_favorites">Favorites</string>
     <string name="bottom_app_bar_watch_later">Watch Later</string>
     <string name="bottom_app_bar_video_collection">Collections</string>
+    <string name="bottom_app_bar_video_home" translatable="false">home</string>
 
     <!--Movie sample item view -->
     <string name="movie_content_description" translatable="false">image movie in the list</string>
@@ -36,6 +37,8 @@
     <string name="dialog_cancel" translatable="false">Cancel</string>
     <string name="dialog_decline" translatable="false">Decline</string>
     <string name="dialog_accept" translatable="false">Accept</string>
-    <string name="your_favorites_movies">Your favorites movies</string>
+    <string name="your_favorites_movies" translatable="false">Your favorites movies</string>
+    <string name="fragment_favorites_title" translatable="false">My Favorites</string>
+
 
 </resources>
