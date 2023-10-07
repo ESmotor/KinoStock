@@ -20,6 +20,10 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
             releaseYearNumber.text = movie.releaseYear.toString()
             descriptionText.text = movie.description
             ratingNumber.text = movie.rating.toString()
+            
+            if (movie.isFavorite) imageFavorite.setImageResource(R.drawable.ic_round_favorite_24)
+            else imageFavorite.setImageResource(R.drawable.ic_favorite_border_24)
+
         }
     }
 
@@ -37,7 +41,7 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         holder.bindSample(data[position])
         holder.binding.cardViewMainBg.setOnClickListener {
-            clickListener.click(data[position])
+            clickListener.click(data[position],position)
         }
     }
 
@@ -57,7 +61,7 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
     //Interface for processing clicks
 
     interface OnItemClickListener {
-        fun click(movie: Movie)
+        fun click(movie: Movie,position: Int)
     }
 
 }
