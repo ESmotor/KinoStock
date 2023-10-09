@@ -80,14 +80,7 @@ class FavoriteFragment : Fragment() {
             Snackbar.make(binding.favoritesLayout, "Navigation menu", Snackbar.LENGTH_SHORT).show()
         }
         binding.topAppBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    Snackbar.make(binding.favoritesLayout, "Settings", Snackbar.LENGTH_SHORT).show()
-                    true
-                }
-
-                else -> false
-            }
+            true
         }
     }
 

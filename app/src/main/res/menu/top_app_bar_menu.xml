@@ -2,8 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_round_settings_24"
-        android:title="@string/top_app_bar_settings"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:title="@string/main_fragment_toolbar_search"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_round_search_24"/>
 </menu>

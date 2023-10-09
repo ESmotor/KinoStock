@@ -37,8 +37,11 @@
     <string name="dialog_cancel" translatable="false">Cancel</string>
     <string name="dialog_decline" translatable="false">Decline</string>
     <string name="dialog_accept" translatable="false">Accept</string>
+
+    <!--For favorites Fragment-->
     <string name="your_favorites_movies" translatable="false">Your favorites movies</string>
     <string name="fragment_favorites_title" translatable="false">My Favorites</string>
+    <string name="main_fragment_toolbar_search">Search</string>
 
 
 </resources>
