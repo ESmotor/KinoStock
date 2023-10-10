@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -21,18 +22,19 @@ import com.itskidan.kinostock.viewModel.DataModel
 
 class FavoriteFragment : Fragment() {
     private lateinit var binding: FragmentFavoriteBinding
-    lateinit var movieAdapter: MovieAdapter
+    private lateinit var movieAdapter: MovieAdapter
 
     private val dataModel: DataModel by activityViewModels()
     lateinit var currentMovieList: ArrayList<Movie>
-    var currentMovie: Movie? = null
-    var currentMoviePos: Int? = null
+    lateinit var favoriteList: ArrayList<Movie>
+    private var currentMovie: Movie? = null
+    private var currentMoviePos: Int? = null
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentFavoriteBinding.inflate(inflater)
         return binding.root
@@ -41,19 +43,49 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Movie List Recycler View
-        //create main Movie Adapter with click listener on items
+        // Movie List Recycler View
+        // create main Movie Adapter with click listener on items
         movieAdapterSetup()
-        //TopAppBar Setup
+
+        // TopAppBar Setup
         topAppBarSetup()
-        //BottomNavigationBar setup
+
+        // BottomNavigationBar setup
         bottomNavigationBarSetup()
-        //Observing requires data
+
+        // Observing requires data
         dataModelObserving()
 
+        // Setup Searching menu and icon
+        onCreateSearchingMenu()
+
+    }
+    // Function for using searching icon and view and changing data
+    private fun onCreateSearchingMenu() {
+        val menu = binding.topAppBar.menu
+        val menuItemSearch = menu.findItem(R.id.search)
+        val searchView = menuItemSearch.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                if (newText.isNullOrEmpty()){
+                    val newDataList = favoriteList
+                    updateDiffDataMovie(newDataList)
+                } else{
+                    val newDataList = ArrayList<Movie>(favoriteList.filter {it.title.contains(newText,true)})
+                    updateDiffDataMovie(newDataList)
+                }
+
+                return false
+            }
+        })
     }
 
-    //Main movie Adapter Setup
+    // Main movie Adapter Setup
     private fun movieAdapterSetup() {
         movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
             override fun click(movie: Movie, position: Int) {
@@ -74,7 +106,7 @@ class FavoriteFragment : Fragment() {
         binding.rvMovieList.addItemDecoration(movieItemsDecoration)
     }
 
-    //TopAppBar Settings and click listener
+    // TopAppBar Settings and click listener
     private fun topAppBarSetup() {
         binding.topAppBar.setNavigationOnClickListener {
             Snackbar.make(binding.favoritesLayout, "Navigation menu", Snackbar.LENGTH_SHORT).show()
@@ -84,7 +116,7 @@ class FavoriteFragment : Fragment() {
         }
     }
 
-    //BottomNavigationBar Settings and click listener
+    // BottomNavigationBar Settings and click listener
     private fun bottomNavigationBarSetup() {
         binding.bottomNavigation.selectedItemId = R.id.favorites
         binding.bottomNavigation.setOnItemSelectedListener {
@@ -124,8 +156,8 @@ class FavoriteFragment : Fragment() {
         }
     }
 
-    //update data with DiffUtil
-    fun updateDiffDataMovie(newData: ArrayList<Movie>) {
+    // update data with DiffUtil
+    private fun updateDiffDataMovie(newData: ArrayList<Movie>) {
         val oldData = movieAdapter.data
         val movieDiff = DiffMovieAdapter(oldData, newData)
         val diffResult = DiffUtil.calculateDiff(movieDiff)
@@ -151,7 +183,7 @@ class FavoriteFragment : Fragment() {
         }
         dataModel.actualMovieList.observe(activity as LifecycleOwner) { movieList ->
             currentMovieList = movieList
-            val favoriteList = ArrayList(movieList.filter { movie -> movie.isFavorite })
+            favoriteList = ArrayList(movieList.filter { movie -> movie.isFavorite })
             updateDiffDataMovie(favoriteList)
         }
     }

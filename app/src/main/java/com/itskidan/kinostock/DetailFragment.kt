@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
 import com.itskidan.kinostock.module.Movie
@@ -26,11 +25,10 @@ import kotlin.math.abs
 class DetailFragment : Fragment() {
     private lateinit var binding: FragmentDetailBinding
     private val dataModel: DataModel by activityViewModels()
-    private var isOpen: Boolean = false
 
-    lateinit var currentMovieList: ArrayList<Movie>
+    private lateinit var currentMovieList: ArrayList<Movie>
     var currentMovie: Movie? = null
-    var currentMoviePos: Int? = null
+    private var currentMoviePos: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +39,7 @@ class DetailFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: android.view.View, savedInstanceState: android.os.Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         //TopAppBar Setup
@@ -70,14 +68,14 @@ class DetailFragment : Fragment() {
                 .show()
         }
 
-        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+        binding.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val totalScrollRange = appBarLayout.totalScrollRange.toFloat()
             val percentage = abs(verticalOffset.toFloat())
             val favBtn = binding.toolbar.menu.findItem(R.id.isFavorite)
             val shareBtn = binding.toolbar.menu.findItem(R.id.share)
             favBtn?.isVisible = (totalScrollRange == percentage)
             shareBtn?.isVisible = (totalScrollRange == percentage)
-        })
+        }
 
         // install menu to our toolbar
         val menuHost: MenuHost = requireActivity()

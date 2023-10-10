@@ -2,7 +2,6 @@ package com.itskidan.kinostock
 
 import android.app.Application
 import timber.log.Timber
-import timber.log.Timber.DebugTree
 
 class App : Application() {
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -51,9 +52,38 @@ class MainFragment : Fragment() {
         // BottomNavigationBar setup
         bottomNavigationBarSetup()
 
+        // Setup Searching menu and icon
+        onCreateSearchingMenu()
+
         // Observing requires data
         dataModelObserving()
     }
+
+    // Function for using searching icon and view and changing data
+    private fun onCreateSearchingMenu() {
+        val menu = binding.topToolbar.menu
+        val menuItemSearch = menu.findItem(R.id.search)
+        val searchView = menuItemSearch.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                if (newText.isNullOrEmpty()){
+                    val newDataList = currentMovieList
+                    updateDiffDataMovie(newDataList)
+                } else{
+                    val newDataList = ArrayList<Movie>(currentMovieList.filter {it.title.contains(newText,true)})
+                    updateDiffDataMovie(newDataList)
+                }
+
+                return false
+            }
+        })
+    }
+
 
     // Main movie Adapter Setup
     private fun movieAdapterSetup() {
@@ -170,12 +200,6 @@ class MainFragment : Fragment() {
             "Header",
             "Astronaut",
             "Wizard OZ"
-        )
-        val subtitleList = listOf(
-            "Action",
-            "Horror",
-            "Fantastic",
-            "Cartoon"
         )
     }
 

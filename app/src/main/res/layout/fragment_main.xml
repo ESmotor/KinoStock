@@ -17,11 +17,12 @@
             android:id="@+id/topToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.Material3.Dark"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:menu="@menu/top_app_bar_menu"
-            android:theme="@style/ThemeOverlay.Material3.Dark"
             app:navigationIcon="@drawable/ic_round_navigation_menu_24"
-            app:title="@string/page_title" />
+            app:title="@string/page_title"
+            app:titleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -34,7 +35,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMovieList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:padding="5dp" />
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
