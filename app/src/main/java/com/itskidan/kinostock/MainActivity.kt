@@ -14,9 +14,9 @@ import com.itskidan.kinostock.viewModel.DataModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    var currentMoviePos: Int? = null
-    var currentMovie: Movie? = null
-    lateinit var currentMovieList: ArrayList<Movie>
+    private var currentMoviePos: Int? = null
+    private var currentMovie: Movie? = null
+    private lateinit var currentMovieList: ArrayList<Movie>
     private val dataModel: DataModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onBackPressed()
         //depending on which fragment in the stack we show the corresponding toolbar
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
             MaterialAlertDialogBuilder(this)
                 .setTitle(resources.getString(R.string.dialog_title))
                 .setMessage(resources.getString(R.string.dialog_supporting_text))
-                .setNeutralButton(resources.getString(R.string.dialog_cancel)) { dialog, which ->
+                .setNeutralButton(resources.getString(R.string.dialog_cancel)) { _, _ ->
                     // Respond to neutral button press
                     addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
                     Snackbar.make(
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 }
-                .setNegativeButton(resources.getString(R.string.dialog_decline)) { dialog, which ->
+                .setNegativeButton(resources.getString(R.string.dialog_decline)) { _, _ ->
                     // Respond to negative button press
                     addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
                     Snackbar.make(
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 }
-                .setPositiveButton(resources.getString(R.string.dialog_accept)) { dialog, which ->
+                .setPositiveButton(resources.getString(R.string.dialog_accept)) { _, _ ->
                     // Respond to positive button press
                     finish()
                 }

@@ -35,7 +35,6 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/detail_image"
                 app:layout_collapseMode="parallax" />
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
