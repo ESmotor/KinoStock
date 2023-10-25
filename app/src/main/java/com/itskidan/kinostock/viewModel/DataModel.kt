@@ -18,4 +18,5 @@ open class DataModel : ViewModel() {
     val actualPosterList: MutableLiveData<ArrayList<Poster>> by lazy {
         MutableLiveData<ArrayList<Poster>>()
     }
+
 }

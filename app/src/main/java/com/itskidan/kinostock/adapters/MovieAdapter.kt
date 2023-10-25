@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.MovieListSampleViewBinding
 import com.itskidan.kinostock.module.Movie
@@ -15,7 +16,11 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
     class MovieViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         val binding = MovieListSampleViewBinding.bind(item)
         fun bindSample(movie: Movie) = with(binding) {
-            imagePosterMovie.setImageResource(movie.imagePoster)
+            //Specify the container in which our image will “live”
+            Glide.with(itemView)
+                .load(movie.imagePoster)
+                .centerCrop()
+                .into(imagePosterMovie)
             titleMovieText.text = movie.title
             releaseYearNumber.text = movie.releaseYear.toString()
             descriptionText.text = movie.description
@@ -44,19 +49,6 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
             clickListener.click(data[position],position)
         }
     }
-
-    fun addLastMovie(movie: Movie) {
-        data.add(movie)
-        val position = data.size - 1
-        notifyItemInserted(position)
-    }
-
-    fun addAllMovies(data: ArrayList<Movie>) {
-        this.data.clear()
-        this.data.addAll(data)
-        notifyDataSetChanged()
-    }
-
 
     //Interface for processing clicks
 

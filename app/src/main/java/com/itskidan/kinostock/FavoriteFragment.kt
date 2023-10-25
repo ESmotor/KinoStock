@@ -1,6 +1,7 @@
 package com.itskidan.kinostock
 
 import android.os.Bundle
+import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,25 @@ class FavoriteFragment : Fragment() {
     private var currentMovie: Movie? = null
     private var currentMoviePos: Int? = null
 
+    init {
+        exitTransition = Fade().apply {
+            duration = 800
+            mode = Fade.MODE_OUT
+        }
+        reenterTransition = Fade().apply {
+            duration = 800
+            mode = Fade.MODE_IN
+
+        }
+        enterTransition = Fade().apply {
+            duration = 800
+            mode = Fade.MODE_IN
+        }
+        returnTransition = Fade().apply {
+            duration = 800
+            mode = Fade.MODE_OUT
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

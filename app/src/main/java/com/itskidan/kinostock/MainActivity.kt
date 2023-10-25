@@ -18,11 +18,11 @@ class MainActivity : AppCompatActivity() {
     private var currentMovie: Movie? = null
     private lateinit var currentMovieList: ArrayList<Movie>
     private val dataModel: DataModel by viewModels()
+    var isFirstLaunch = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         //put the observer in the activity we need
         lifecycle.addObserver(App.instance.lifecycleObserver)
         //Monitoring changes in variables in the DataModel class
@@ -136,5 +136,8 @@ class MainActivity : AppCompatActivity() {
         dataModel.actualMovieList.observe(this@MainActivity) { movieList ->
             currentMovieList = movieList
         }
+    }
+    companion object {
+        var isFirstLaunch = true
     }
 }
