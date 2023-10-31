@@ -31,26 +31,6 @@ class DetailFragment : Fragment() {
     var currentMovie: Movie? = null
     private var currentMoviePos: Int? = null
 
-    init {
-        exitTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-        reenterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-
-        }
-        enterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-        }
-        returnTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

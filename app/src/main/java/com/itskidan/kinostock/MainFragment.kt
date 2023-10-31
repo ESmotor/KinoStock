@@ -43,27 +43,6 @@ class MainFragment : Fragment() {
     private var currentMovie: Movie? = null
     private var currentMoviePos: Int? = null
 
-
-    init {
-        exitTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-        reenterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-
-        }
-        enterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-        }
-        returnTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -75,36 +54,6 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //create scene for home page and enter to this scene
-        val scene = Scene.getSceneForLayout(
-            binding.rootMainFragment,
-            R.layout.merge_home_screen_content,
-            requireContext()
-        )
-
-        //create animation for our home page
-        val toolbarSlide = Slide().apply {
-            slideEdge = Gravity.TOP
-            mode = Slide.MODE_IN
-            addTarget(R.id.topAppBarLayout)
-        }
-        val rvSlide = Slide().apply {
-            slideEdge = Gravity.BOTTOM
-            mode = Slide.MODE_IN
-            addTarget(R.id.nestedScrollView)
-        }
-        val customTransition = TransitionSet().apply {
-            duration = 500
-            addTransition(toolbarSlide)
-            addTransition(rvSlide)
-        }
-
-        if (isFirstLaunch) {
-            TransitionManager.go(scene, customTransition)
-            isFirstLaunch = false
-        } else {
-            scene.enter()
-        }
 
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
@@ -213,18 +162,20 @@ class MainFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
-                    Snackbar.make(binding.rootMainFragment, "Watch Later", Snackbar.LENGTH_SHORT)
-                        .show()
+                    addFragment(
+                        WatchLaterFragment(),
+                        Constants.WATCH_LATER_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                     true
                 }
 
                 R.id.collection -> {
-                    Snackbar.make(
-                        binding.rootMainFragment,
-                        "Film collection",
-                        Snackbar.LENGTH_SHORT
+                    addFragment(
+                        CollectionsFragment(),
+                        Constants.COLLECTIONS_FRAGMENT,
+                        R.id.fragmentContainerMain
                     )
-                        .show()
                     true
                 }
 

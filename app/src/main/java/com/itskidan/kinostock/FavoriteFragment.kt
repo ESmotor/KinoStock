@@ -31,26 +31,6 @@ class FavoriteFragment : Fragment() {
     private var currentMovie: Movie? = null
     private var currentMoviePos: Int? = null
 
-    init {
-        exitTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-        reenterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-
-        }
-        enterTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_IN
-        }
-        returnTransition = Fade().apply {
-            duration = 800
-            mode = Fade.MODE_OUT
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -160,14 +140,20 @@ class FavoriteFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
-                    Snackbar.make(binding.favoritesLayout, "Watch Later", Snackbar.LENGTH_SHORT)
-                        .show()
+                    addFragment(
+                        WatchLaterFragment(),
+                        Constants.WATCH_LATER_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                     true
                 }
 
                 R.id.collection -> {
-                    Snackbar.make(binding.favoritesLayout, "Film collection", Snackbar.LENGTH_SHORT)
-                        .show()
+                    addFragment(
+                        CollectionsFragment(),
+                        Constants.COLLECTIONS_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                     true
                 }
 
