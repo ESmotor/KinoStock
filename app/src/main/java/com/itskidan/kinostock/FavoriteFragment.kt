@@ -1,7 +1,6 @@
 package com.itskidan.kinostock
 
 import android.os.Bundle
-import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import com.itskidan.kinostock.adapters.DiffMovieAdapter
 import com.itskidan.kinostock.adapters.MovieAdapter
 import com.itskidan.kinostock.adapters.MovieItemsDecoration
 import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
+import com.itskidan.kinostock.detailpage.DetailFragment
 import com.itskidan.kinostock.module.Movie
 import com.itskidan.kinostock.viewModel.DataModel
 
@@ -42,7 +42,7 @@ class FavoriteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        EnterFragmentAnimation.performFragmentCircularRevealAnimation(binding.favoritesLayout, requireActivity(), 2)
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
         movieAdapterSetup()
@@ -122,8 +122,11 @@ class FavoriteFragment : Fragment() {
         binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.MAIN_FRAGMENT)
                     addFragment(
-                        MainFragment(),
+                        fragment ?: MainFragment(),
                         Constants.MAIN_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -131,8 +134,11 @@ class FavoriteFragment : Fragment() {
                 }
 
                 R.id.favorites -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.FAVORITE_FRAGMENT)
                     addFragment(
-                        FavoriteFragment(),
+                        fragment ?: FavoriteFragment(),
                         Constants.FAVORITE_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -140,8 +146,11 @@ class FavoriteFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.WATCH_LATER_FRAGMENT)
                     addFragment(
-                        WatchLaterFragment(),
+                        fragment ?: WatchLaterFragment(),
                         Constants.WATCH_LATER_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -149,8 +158,11 @@ class FavoriteFragment : Fragment() {
                 }
 
                 R.id.collection -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.COLLECTIONS_FRAGMENT)
                     addFragment(
-                        CollectionsFragment(),
+                        fragment ?:CollectionsFragment(),
                         Constants.COLLECTIONS_FRAGMENT,
                         R.id.fragmentContainerMain
                     )

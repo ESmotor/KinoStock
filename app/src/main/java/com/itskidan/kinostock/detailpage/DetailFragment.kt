@@ -1,8 +1,7 @@
-package com.itskidan.kinostock
+package com.itskidan.kinostock.detailpage
 
 import android.content.Intent
 import android.os.Bundle
-import android.transition.Fade
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,10 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.material.snackbar.Snackbar
+import com.itskidan.kinostock.EnterFragmentAnimation
+import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
 import com.itskidan.kinostock.module.Movie
 import com.itskidan.kinostock.viewModel.DataModel
@@ -43,6 +45,16 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val pagerAdapter = ScreenSlidePagerAdapter(requireActivity().supportFragmentManager)
+        binding.viewPagerContainer.adapter = pagerAdapter
+        //binding.viewPagerContainer.setPageTransformer(true, ZoomPageTransformer())
+
+        // create enter animation for fragments like CircularRevealAnimation
+        EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+            binding.detailLayout,
+            requireActivity(),
+            2
+        )
         //TopAppBar Setup
         setUpAppBarLayout()
         //Share floating bar click listener
@@ -55,9 +67,19 @@ class DetailFragment : Fragment() {
         }
         //Observing requires data
         dataModelObserving()
+
+
     }
 
-
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm,
+        BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+    ) {
+        override fun getCount(): Int = NUM_PAGES
+        override fun getItem(position: Int): Fragment = PageFragment(position)
+    }
+    companion object {
+        const val NUM_PAGES = 5
+    }
     private fun setUpAppBarLayout() {
         //setup toolbar
         val toolbar = binding.toolbar
@@ -65,8 +87,7 @@ class DetailFragment : Fragment() {
 
         //TopAppBar Settings and click listener
         toolbar.setNavigationOnClickListener {
-            Snackbar.make(binding.detailLayout, "Back to main page", Snackbar.LENGTH_SHORT)
-                .show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -168,12 +189,12 @@ class DetailFragment : Fragment() {
             if (movie != null) {
                 currentMovie = movie
                 binding.collapsingToolbarLayout.title = movie.title
-                binding.imageMovie.setImageResource(R.drawable.transformers)
+                //binding.imageMovie.setImageResource(R.drawable.transformers)
                 binding.tvMovieDescription.text = movie.description
                 binding.tvMovieReleasedYear.text = movie.releaseYear.toString()
             } else {
                 binding.collapsingToolbarLayout.title = getString(R.string.error_title)
-                binding.imageMovie.setImageResource(R.drawable.error)
+                //binding.imageMovie.setImageResource(R.drawable.error)
                 binding.tvMovieDescription.text = getString(R.string.error_description)
             }
         }

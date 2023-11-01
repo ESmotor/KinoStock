@@ -5,7 +5,10 @@
     android:id="@+id/rootMainFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainFragment">
+    tools:context=".MainFragment"
+    android:background="?android:colorBackground"
+    android:visibility="invisible"
+    tools:visibility="visible">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/topAppBarLayout"

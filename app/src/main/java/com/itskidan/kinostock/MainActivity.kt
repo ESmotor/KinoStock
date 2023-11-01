@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
     private var currentMovie: Movie? = null
     private lateinit var currentMovieList: ArrayList<Movie>
     private val dataModel: DataModel by viewModels()
-    var isFirstLaunch = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -73,6 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // function to track changes in the fragment manager
     private fun fragmentManagerSetup() {
         supportFragmentManager.addOnBackStackChangedListener {
             // In this block we will perform actions when changing the stack of fragments
@@ -89,8 +89,16 @@ class MainActivity : AppCompatActivity() {
                     favoriteItem.isChecked = true
                 }
 
-                is DetailFragment -> {
+                is WatchLaterFragment -> {
+                    val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+                    val watchLaterItem = botNavView.menu.findItem(R.id.watch_later)
+                    watchLaterItem.isChecked = true
+                }
 
+                is CollectionsFragment -> {
+                    val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+                    val collectionsItem = botNavView.menu.findItem(R.id.collection)
+                    collectionsItem.isChecked = true
                 }
             }
         }
@@ -136,8 +144,5 @@ class MainActivity : AppCompatActivity() {
         dataModel.actualMovieList.observe(this@MainActivity) { movieList ->
             currentMovieList = movieList
         }
-    }
-    companion object {
-        var isFirstLaunch = true
     }
 }
