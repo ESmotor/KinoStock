@@ -1,12 +1,7 @@
 package com.itskidan.kinostock
 
+
 import android.os.Bundle
-import android.transition.Fade
-import android.transition.Scene
-import android.transition.Slide
-import android.transition.TransitionManager
-import android.transition.TransitionSet
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,17 +12,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
-
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.itskidan.kinostock.MainActivity.Companion.isFirstLaunch
 import com.itskidan.kinostock.adapters.DiffMovieAdapter
 import com.itskidan.kinostock.adapters.MovieAdapter
 import com.itskidan.kinostock.adapters.MovieItemsDecoration
 import com.itskidan.kinostock.databinding.FragmentMainBinding
-import com.itskidan.kinostock.databinding.MergeHomeScreenContentBinding
+import com.itskidan.kinostock.detailpage.DetailFragment
 import com.itskidan.kinostock.module.Movie
 import com.itskidan.kinostock.viewModel.DataModel
 
@@ -54,7 +46,8 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        // create enter animation for fragments like CircularRevealAnimation
+        EnterFragmentAnimation.performFragmentCircularRevealAnimation(binding.rootMainFragment, requireActivity(), 1)
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
         movieAdapterSetup()
@@ -144,8 +137,11 @@ class MainFragment : Fragment() {
         botNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.MAIN_FRAGMENT)
                     addFragment(
-                        MainFragment(),
+                        fragment ?: MainFragment(),
                         Constants.MAIN_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -153,8 +149,11 @@ class MainFragment : Fragment() {
                 }
 
                 R.id.favorites -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.FAVORITE_FRAGMENT)
                     addFragment(
-                        FavoriteFragment(),
+                        fragment ?: FavoriteFragment(),
                         Constants.FAVORITE_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -162,8 +161,11 @@ class MainFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.WATCH_LATER_FRAGMENT)
                     addFragment(
-                        WatchLaterFragment(),
+                        fragment ?: WatchLaterFragment(),
                         Constants.WATCH_LATER_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -171,8 +173,11 @@ class MainFragment : Fragment() {
                 }
 
                 R.id.collection -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.COLLECTIONS_FRAGMENT)
                     addFragment(
-                        CollectionsFragment(),
+                        fragment ?:CollectionsFragment(),
                         Constants.COLLECTIONS_FRAGMENT,
                         R.id.fragmentContainerMain
                     )

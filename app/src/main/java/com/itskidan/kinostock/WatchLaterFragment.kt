@@ -21,17 +21,23 @@ class WatchLaterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        EnterFragmentAnimation.performFragmentCircularRevealAnimation(binding.rootWatchLaterFragment, requireActivity(), 3)
 
+        // BottomNavigationBar setup
+        bottomNavigationBarSetup()
     }
 
     // BottomNavigationBar Settings and click listener
     private fun bottomNavigationBarSetup() {
-        binding.bottomNavigation.selectedItemId = R.id.favorites
+        binding.bottomNavigation.selectedItemId = R.id.watch_later
         binding.bottomNavigation.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.MAIN_FRAGMENT)
                     addFragment(
-                        MainFragment(),
+                        fragment ?: MainFragment(),
                         Constants.MAIN_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -39,8 +45,11 @@ class WatchLaterFragment : Fragment() {
                 }
 
                 R.id.favorites -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.FAVORITE_FRAGMENT)
                     addFragment(
-                        FavoriteFragment(),
+                        fragment ?: FavoriteFragment(),
                         Constants.FAVORITE_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -48,8 +57,11 @@ class WatchLaterFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.WATCH_LATER_FRAGMENT)
                     addFragment(
-                        WatchLaterFragment(),
+                        fragment ?: WatchLaterFragment(),
                         Constants.WATCH_LATER_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -57,8 +69,11 @@ class WatchLaterFragment : Fragment() {
                 }
 
                 R.id.collection -> {
+                    val fragment: Fragment? = requireActivity()
+                        .supportFragmentManager
+                        .findFragmentByTag(Constants.COLLECTIONS_FRAGMENT)
                     addFragment(
-                        CollectionsFragment(),
+                        fragment ?:CollectionsFragment(),
                         Constants.COLLECTIONS_FRAGMENT,
                         R.id.fragmentContainerMain
                     )
@@ -69,6 +84,7 @@ class WatchLaterFragment : Fragment() {
             }
         }
     }
+
     // function for adding fragment
     private fun addFragment(fragment: Fragment, tag: String, container: Int) {
         val activity = requireActivity()

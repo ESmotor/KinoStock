@@ -5,7 +5,10 @@
     android:id="@+id/rootCollectionsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CollectionsFragment">
+    tools:context=".CollectionsFragment"
+    android:background="?android:colorBackground"
+    android:visibility="invisible"
+    tools:visibility="visible">
 
     <TextView
         android:layout_width="match_parent"
