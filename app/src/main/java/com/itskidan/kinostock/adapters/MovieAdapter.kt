@@ -24,7 +24,8 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
             titleMovieText.text = movie.title
             releaseYearNumber.text = movie.releaseYear.toString()
             descriptionText.text = movie.description
-            ratingNumber.text = movie.rating.toString()
+            ratingNumber.text = (movie.rating.toDouble()/10.0).toString()
+            movieRating.setRatingAnimated(movie.rating)
             
             if (movie.isFavorite) imageFavorite.setImageResource(R.drawable.ic_round_favorite_24)
             else imageFavorite.setImageResource(R.drawable.ic_favorite_border_24)

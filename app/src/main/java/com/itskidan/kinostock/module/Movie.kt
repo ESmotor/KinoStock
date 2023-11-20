@@ -10,6 +10,6 @@ data class Movie(
     val title: String,
     val releaseYear: Int,
     val description: String,
-    val rating: Double,
+    val rating: Int,
     var isFavorite: Boolean
 ) : Parcelable
