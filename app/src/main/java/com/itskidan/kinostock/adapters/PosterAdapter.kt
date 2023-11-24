@@ -15,9 +15,7 @@ class PosterAdapter : RecyclerView.Adapter<PosterAdapter.PosterViewHolder>() {
         private val binding = PosterSampleViewBinding.bind(item)
 
         fun bindSample(poster: Poster) = with(binding) {
-            posterImageView.setImageResource(poster.imageId)
-            posterTitle.text = poster.title
-            posterSubTitle.text = poster.subTilte
+
         }
     }
 
