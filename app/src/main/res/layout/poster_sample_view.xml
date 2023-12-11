@@ -9,7 +9,7 @@
     android:focusable="true"
     android:stateListAnimator="@animator/grid_poster_click_animator">
 
-    <com.itskidan.kinostock.ratingview.RatingView
+    <com.itskidan.kinostock.view.customview.RatingView
         android:id="@+id/ratingView"
         android:layout_width="100dp"
         android:layout_height="100dp"

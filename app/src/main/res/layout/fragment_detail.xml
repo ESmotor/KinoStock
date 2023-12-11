@@ -1,136 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/detailLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="?android:colorBackground"
-    app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-    tools:context=".detailpage.DetailFragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <data>
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsingToolbarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            android:minHeight="?attr/actionBarSize"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            app:toolbarId="@+id/toolbar">
+    </data>
 
-<!--            <androidx.appcompat.widget.AppCompatImageView-->
-<!--                android:id="@+id/image_movie"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:background="@color/colorAccent"-->
-<!--                android:fitsSystemWindows="true"-->
-<!--                android:scaleType="centerCrop"-->
-<!--                android:src="@drawable/detail_image"-->
-<!--                app:layout_collapseMode="parallax" />-->
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/viewPagerContainer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax"/>
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_round_arrow_back_24"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:subtitleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
-                app:titleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6" />
-
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/detailLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:background="?android:colorBackground"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        tools:context=".view.fragments.DetailFragment">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:fitsSystemWindows="true"
-            android:orientation="vertical">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                android:minHeight="?attr/actionBarSize"
+                app:contentScrim="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                app:toolbarId="@+id/toolbar">
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/viewPagerContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true"
+                    app:layout_collapseMode="parallax" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:navigationIcon="@drawable/ic_round_arrow_back_24"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:subtitleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
+                    app:titleTextAppearance="@style/TextAppearance.MdcTypographyStyles.Headline6" />
+
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tv_movie_released_year_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:lineSpacingExtra="8dp"
-                    android:padding="12dp"
-                    android:text="@string/release_year"
-                    android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
-                    android:textSize="20sp" />
-                <TextView
-                    android:id="@+id/tv_movie_released_year"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:lineSpacingExtra="8dp"
-                    android:padding="12dp"
-                    android:text="2023"
-                    android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
-                    android:textSize="20sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_movie_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="8dp"
-                android:padding="12dp"
-                android:text="@string/lorem"
-                android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Body2"
-                android:textSize="20sp" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                android:fitsSystemWindows="true"
+                android:orientation="vertical">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/share_action"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_round_share_24" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fitsSystemWindows="true"
+                    android:orientation="horizontal">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_fav"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:contentDescription="@string/share_action"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_favorite_border_24" />
+                    <TextView
+                        android:id="@+id/tv_movie_released_year_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="8dp"
+                        android:padding="12dp"
+                        android:text="@string/release_year"
+                        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
+                        android:textSize="20sp" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+                    <TextView
+                        android:id="@+id/tv_movie_released_year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="8dp"
+                        android:padding="12dp"
+                        android:text="2023"
+                        android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Subtitle1"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_movie_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="8dp"
+                    android:padding="12dp"
+                    android:text="@string/lorem"
+                    android:textAppearance="@style/TextAppearance.MdcTypographyStyles.Body2"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/share_action"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_round_share_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:contentDescription="@string/share_action"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_favorite_border_24" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
 
 
 
