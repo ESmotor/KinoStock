@@ -127,7 +127,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <com.itskidan.kinostock.ratingview.RatingView
+    <com.itskidan.kinostock.view.customview.RatingView
         android:id="@+id/movie_rating"
         android:layout_width="30dp"
         android:layout_height="30dp"

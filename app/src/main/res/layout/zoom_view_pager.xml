@@ -5,7 +5,7 @@
     android:id="@+id/rootZoomViewPagerFragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".detailpage.DetailFragment">
+    tools:context=".view.fragments.DetailFragment">
 
     <ImageView
         android:id="@+id/image"

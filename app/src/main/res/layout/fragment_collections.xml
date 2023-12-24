@@ -5,7 +5,7 @@
     android:id="@+id/rootCollectionsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CollectionsFragment"
+    tools:context=".view.fragments.CollectionsFragment"
     android:background="?android:colorBackground"
     android:visibility="invisible"
     tools:visibility="visible">
