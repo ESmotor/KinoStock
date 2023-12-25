@@ -1,11 +1,11 @@
 package com.itskidan.kinostock.view.rv_adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import com.itskidan.kinostock.domain.Movie
+import com.itskidan.kinostock.domain.Film
 
 class DiffMovieAdapter(
-    val oldList: ArrayList<Movie>,
-    val newList: ArrayList<Movie>
+    val oldList: ArrayList<Film>,
+    val newList: ArrayList<Film>
 ) : DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldList.size
@@ -22,11 +22,11 @@ class DiffMovieAdapter(
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldMovie = oldList[oldItemPosition]
         val newMovie = newList[newItemPosition]
-        return oldMovie.imagePoster == newMovie.imagePoster &&
+        return oldMovie.poster == newMovie.poster &&
                 oldMovie.title == newMovie.title &&
-                oldMovie.releaseYear == newMovie.releaseYear &&
+                oldMovie.releaseDate == newMovie.releaseDate &&
                 oldMovie.description == newMovie.description &&
                 oldMovie.rating == newMovie.rating &&
-                oldMovie.isFavorite == newMovie.isFavorite
+                oldMovie.isInFavorites == newMovie.isInFavorites
     }
 }

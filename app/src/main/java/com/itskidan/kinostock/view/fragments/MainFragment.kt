@@ -17,16 +17,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.R
+import com.itskidan.kinostock.databinding.FragmentMainBinding
+import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.paging.PaginationScrollListener
+import com.itskidan.kinostock.utils.Constants
+import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.DiffMovieAdapter
 import com.itskidan.kinostock.view.rv_adapters.MovieAdapter
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
-import com.itskidan.kinostock.databinding.FragmentMainBinding
-import com.itskidan.kinostock.domain.Movie
-import com.itskidan.kinostock.utils.EnterFragmentAnimation
-import com.itskidan.kinostock.viewmodel.UtilityViewModel
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
+import com.itskidan.kinostock.viewmodel.UtilityViewModel
 
 class MainFragment : Fragment() {
 
@@ -38,17 +39,18 @@ class MainFragment : Fragment() {
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(MainFragmentViewModel::class.java)
     }
-    private var filmsDataBase = ArrayList<Movie>()
-    //Используем backing field
-    set(value) {
-        //Если придет такое же значение, то мы выходим из метода
-        if (field==value) return
-        //Если пришло другое значение, то кладем его в переменную
-        field = value
-        updateDiffDataMovie(field)
-    }
+    private var filmsDataBase = ArrayList<Film>()
+        //Используем backing field
+        set(value) {
+            //Если придет такое же значение, то мы выходим из метода
+            if (field == value) return
+            //Если пришло другое значение, то кладем его в переменную
+            field = value
+            updateDiffDataMovie(field)
+        }
 
-    private var currentMovie: Movie? = null
+    //private var isLoadingFilms = true
+    private var currentFilm: Film? = null
     private var currentMoviePos: Int? = null
 
     override fun onCreateView(
@@ -63,8 +65,9 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner,Observer<ArrayList<Movie>>{
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Film>> {
             filmsDataBase = it
+            utilityViewModel.actualFilmList.value = it
             updateDiffDataMovie(filmsDataBase)
         })
 
@@ -79,6 +82,7 @@ class MainFragment : Fragment() {
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
         movieAdapterSetup()
+        addScrollListener()
 
         // TopAppBar Setup
         topAppBarSetup()
@@ -91,8 +95,6 @@ class MainFragment : Fragment() {
 
         // Observing requires data
         dataModelObserving()
-
-
     }
 
     // Function for using searching icon and view and changing data
@@ -119,9 +121,9 @@ class MainFragment : Fragment() {
     // Main movie Adapter Setup
     private fun movieAdapterSetup() {
         movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
-            override fun click(movie: Movie, position: Int) {
+            override fun click(film: Film, position: Int) {
                 //reaction to a click on a Recycler View element
-                utilityViewModel.chosenMovie.value = movie
+                utilityViewModel.chosenFilm.value = film
                 utilityViewModel.chosenMoviePosition.value = position
                 addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
             }
@@ -136,6 +138,20 @@ class MainFragment : Fragment() {
         rvMovieList.adapter = movieAdapter
         rvMovieList.layoutManager = layoutManagerMovie
         rvMovieList.addItemDecoration(movieItemsDecoration)
+
+    }
+
+    private fun addScrollListener() {
+        binding.rvMovieList.addOnScrollListener(object :
+            PaginationScrollListener(binding.rvMovieList.layoutManager as LinearLayoutManager) {
+            override fun loadMoreItems() {
+                viewModel.fetchFilms()
+            }
+
+            override fun isLastPage() = viewModel.isAllPagesLoaded
+
+            override fun isLoading() = viewModel.isLoading
+        })
     }
 
     // TopAppBar Settings and click listener
@@ -209,7 +225,7 @@ class MainFragment : Fragment() {
     }
 
     // update data with DiffUtil
-    private fun updateDiffDataMovie(newData: ArrayList<Movie>) {
+    private fun updateDiffDataMovie(newData: ArrayList<Film>) {
         val oldData = movieAdapter.data
         val movieDiff = DiffMovieAdapter(oldData, newData)
         val diffResult = DiffUtil.calculateDiff(movieDiff)
@@ -232,8 +248,8 @@ class MainFragment : Fragment() {
         utilityViewModel.chosenMoviePosition.observe(activity as LifecycleOwner) { position ->
             currentMoviePos = position
         }
-        utilityViewModel.chosenMovie.observe(activity as LifecycleOwner) { movie ->
-            currentMovie = movie
+        utilityViewModel.chosenFilm.observe(activity as LifecycleOwner) { movie ->
+            currentFilm = movie
         }
     }
 

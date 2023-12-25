@@ -18,12 +18,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
-import com.itskidan.kinostock.domain.Movie
+import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.utils.ApiConstants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.viewmodel.DetailFragmentViewModel
 import com.itskidan.kinostock.viewmodel.UtilityViewModel
+import timber.log.Timber
 import kotlin.math.abs
 
 
@@ -34,7 +37,7 @@ class DetailFragment : Fragment() {
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(DetailFragmentViewModel::class.java)
     }
-    private var filmsDataBase = ArrayList<Movie>()
+    private var filmsDataBase = ArrayList<Film>()
         // Use backing field
         set(value) {
             // If the same value comes, then we exit the method
@@ -43,8 +46,8 @@ class DetailFragment : Fragment() {
             field = value
         }
 
-    var chosenMovie: Movie? = null
-    private var chosenMoviePosition: Int? = null
+    var chosenFilm: Film? = null
+    var chosenMoviePosition: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,15 +61,20 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Movie>>{
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Film>> {
             filmsDataBase = it
         })
         // Observing requires data
         dataModelObserving()
 
-        val pagerAdapter = ScreenSlidePagerAdapter(requireActivity().supportFragmentManager)
-        binding.viewPagerContainer.adapter = pagerAdapter
+        //val pagerAdapter = ScreenSlidePagerAdapter(requireActivity().supportFragmentManager)
+        //binding.viewPagerContainer.adapter = pagerAdapter
         // binding.viewPagerContainer.setPageTransformer(true, ZoomPageTransformer())
+
+        Glide.with(this)
+            .load(ApiConstants.IMAGES_URL + "w780" + chosenFilm?.poster)
+            .centerCrop()
+            .into(binding.detailsPoster)
 
         // create enter animation for fragments like CircularRevealAnimation
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
@@ -78,26 +86,27 @@ class DetailFragment : Fragment() {
         setUpAppBarLayout()
         // Share floating bar click listener
         binding.fabShare.setOnClickListener {
-            viewModel.onShareClick(requireContext(),chosenMovie!!)
+            viewModel.onShareClick(requireContext(), chosenFilm!!)
         }
         // Favorite floating bar click listener
         binding.fabFav.setOnClickListener {
             onFavoriteClick()
         }
 
-
-
+        // log
+        Timber.tag("MyLog").d("Position = ${chosenMoviePosition}")
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm,
-        BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
-    ) {
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
+        FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getCount(): Int = NUM_PAGES
         override fun getItem(position: Int): Fragment = PageFragment(position)
     }
+
     companion object {
         const val NUM_PAGES = 5
     }
+
     private fun setUpAppBarLayout() {
         //setup toolbar
         val toolbar = binding.toolbar
@@ -126,7 +135,7 @@ class DetailFragment : Fragment() {
                 menuInflater.inflate(R.menu.top_fragment_menu, menu)
                 // Find item menu isFavorite
                 val isFavoriteMenuItem = menu.findItem(R.id.isFavorite)
-                if (chosenMovie!!.isFavorite) {
+                if (chosenFilm!!.isInFavorites) {
                     isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
                     binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
                 } else {
@@ -146,7 +155,7 @@ class DetailFragment : Fragment() {
                     }
 
                     R.id.share -> {
-                        viewModel.onShareClick(requireContext(),chosenMovie!!)
+                        viewModel.onShareClick(requireContext(), chosenFilm!!)
                         true
                     }
 
@@ -163,20 +172,20 @@ class DetailFragment : Fragment() {
 
         val menu = binding.toolbar.menu
         val isFavoriteMenuItem = menu.findItem(R.id.isFavorite)
-        if (chosenMovie != null && chosenMovie!!.isFavorite) {
-            chosenMovie!!.isFavorite = false
+        if (chosenFilm != null && chosenFilm!!.isInFavorites) {
+            chosenFilm!!.isInFavorites = false
             isFavoriteMenuItem.setIcon(R.drawable.ic_favorite_border_24)
             binding.fabFav.setImageResource(R.drawable.ic_favorite_border_24)
-        } else if (chosenMovie != null && !(chosenMovie!!.isFavorite)) {
-            chosenMovie!!.isFavorite = true
+        } else if (chosenFilm != null && !(chosenFilm!!.isInFavorites)) {
+            chosenFilm!!.isInFavorites = true
             isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
         }
 
-        filmsDataBase[chosenMoviePosition!!] = chosenMovie!!
-        utilityViewModel.chosenMovie.value = chosenMovie
+        filmsDataBase[chosenMoviePosition!!] = chosenFilm!!
+        utilityViewModel.chosenFilm.value = chosenFilm
         utilityViewModel.chosenMoviePosition.value = chosenMoviePosition
-        utilityViewModel.actualMovieList.value = filmsDataBase
+        utilityViewModel.actualFilmList.value = filmsDataBase
 
     }
 
@@ -184,15 +193,15 @@ class DetailFragment : Fragment() {
         utilityViewModel.chosenMoviePosition.observe(activity as LifecycleOwner) { position ->
             chosenMoviePosition = position
         }
-        utilityViewModel.chosenMovie.observe(activity as LifecycleOwner) { movie ->
-            chosenMovie = movie
+        utilityViewModel.chosenFilm.observe(activity as LifecycleOwner) { film ->
+            chosenFilm = film
             //if the variable is not null, then we process its parameters in the way we need
-            if (movie != null) {
-                chosenMovie = movie
-                binding.collapsingToolbarLayout.title = movie.title
+            if (film != null) {
+                chosenFilm = film
+                binding.collapsingToolbarLayout.title = film.title
                 //binding.imageMovie.setImageResource(R.drawable.transformers)
-                binding.tvMovieDescription.text = movie.description
-                binding.tvMovieReleasedYear.text = movie.releaseYear.toString()
+                binding.tvMovieDescription.text = film.description
+                binding.tvMovieReleasedYear.text = film.releaseDate.toString()
             } else {
                 binding.collapsingToolbarLayout.title = getString(R.string.error_title)
                 //binding.imageMovie.setImageResource(R.drawable.error)

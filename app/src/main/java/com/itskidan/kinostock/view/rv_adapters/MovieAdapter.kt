@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.itskidan.kinostock.R
-import com.itskidan.kinostock.domain.Movie
+import com.itskidan.kinostock.domain.Film
 import com.itskidan.kinostock.view.rv_viewholders.MovieViewHolder
 
 class MovieAdapter(private val clickListener: OnItemClickListener) :
     RecyclerView.Adapter<MovieViewHolder>() {
-    var data = ArrayList<Movie>()
+    var data = ArrayList<Film>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val view =
@@ -32,7 +32,7 @@ class MovieAdapter(private val clickListener: OnItemClickListener) :
     //Interface for processing clicks
 
     interface OnItemClickListener {
-        fun click(movie: Movie, position: Int)
+        fun click(film: Film, position: Int)
     }
 
 }
