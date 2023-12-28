@@ -16,7 +16,7 @@ class Interactor(private val repository: MainRepository, private val retrofitSer
     // are received
     // and the page to load (this is for pagination)
     fun getFilmsFromApi(page: Int, callback: MainFragmentViewModel.ApiCallback) {
-        retrofitService.getFilms(apiKey = API.KEY, language = "ru-RU", page = page)
+        retrofitService.getFilms(apiKey = API.KEY, language = "en-US", page = page)
             .enqueue(object : Callback<TmdbResultsDto> {
                 override fun onResponse(
                     call: Call<TmdbResultsDto>,

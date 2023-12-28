@@ -65,4 +65,6 @@ dependencies {
     // paging
     implementation ("androidx.paging:paging-runtime:3.2.1")
     implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
+    // delegate
+    implementation( "com.hannesdorfmann:adapterdelegates4-kotlin-dsl-viewbinding:4.3.2")
 }

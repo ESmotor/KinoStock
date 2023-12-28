@@ -38,13 +38,7 @@ class DetailFragment : Fragment() {
         ViewModelProvider.NewInstanceFactory().create(DetailFragmentViewModel::class.java)
     }
     private var filmsDataBase = ArrayList<Film>()
-        // Use backing field
-        set(value) {
-            // If the same value comes, then we exit the method
-            if (field == value) return
-            // If another value arrives, then put it in a variable
-            field = value
-        }
+    private var favoriteFilmList = ArrayList<Film>()
 
     var chosenFilm: Film? = null
     var chosenMoviePosition: Int? = null
@@ -176,22 +170,26 @@ class DetailFragment : Fragment() {
             chosenFilm!!.isInFavorites = false
             isFavoriteMenuItem.setIcon(R.drawable.ic_favorite_border_24)
             binding.fabFav.setImageResource(R.drawable.ic_favorite_border_24)
+            if (favoriteFilmList.contains(chosenFilm)) favoriteFilmList.remove(chosenFilm)
         } else if (chosenFilm != null && !(chosenFilm!!.isInFavorites)) {
             chosenFilm!!.isInFavorites = true
             isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
+            if (!(favoriteFilmList.contains(chosenFilm))) favoriteFilmList.add(chosenFilm!!)
         }
 
-        filmsDataBase[chosenMoviePosition!!] = chosenFilm!!
+        utilityViewModel.favoriteFilmList.value = favoriteFilmList
         utilityViewModel.chosenFilm.value = chosenFilm
         utilityViewModel.chosenMoviePosition.value = chosenMoviePosition
-        utilityViewModel.actualFilmList.value = filmsDataBase
 
     }
 
     private fun dataModelObserving() {
         utilityViewModel.chosenMoviePosition.observe(activity as LifecycleOwner) { position ->
             chosenMoviePosition = position
+        }
+        utilityViewModel.favoriteFilmList.observe(activity as LifecycleOwner) { list ->
+            favoriteFilmList = list
         }
         utilityViewModel.chosenFilm.observe(activity as LifecycleOwner) { film ->
             chosenFilm = film
