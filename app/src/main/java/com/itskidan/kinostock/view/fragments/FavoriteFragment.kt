@@ -7,44 +7,35 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
-import com.itskidan.kinostock.domain.Movie
+import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
-import com.itskidan.kinostock.view.rv_adapters.DiffMovieAdapter
-import com.itskidan.kinostock.view.rv_adapters.MovieAdapter
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.FavoriteFragmentViewModel
 import com.itskidan.kinostock.viewmodel.UtilityViewModel
+import com.itskidan.myapplication.ModelItemDiffAdapter
+import timber.log.Timber
 
 
-class FavoriteFragment : Fragment() {
+class FavoriteFragment : Fragment(), OnItemClickListener {
     private lateinit var binding: FragmentFavoriteBinding
-    private lateinit var movieAdapter: MovieAdapter
+    private val modelAdapter = ModelItemDiffAdapter(this)
 
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(FavoriteFragmentViewModel::class.java)
     }
-    private var favoriteFilmsDataBase = ArrayList<Movie>()
-    private var filmsDataBase = ArrayList<Movie>()
-        // Use backing field
-        set(value) {
-            // If the same value comes, then we exit the method
-            if (field == value) return
-            // If another value arrives, then put it in a variable
-            field = value
-            updateDiffDataMovie(field)
-        }
 
     private val utilityViewModel: UtilityViewModel by activityViewModels()
-
-
+    private var actualFilmList = ArrayList<Film>()
+    private var favoriteFilmList = ArrayList<Film>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,10 +48,9 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
-            filmsDataBase = it
-            favoriteFilmsDataBase = viewModel.makeFavoriteFilmsDataBase(filmsDataBase)
-            updateDiffDataMovie(favoriteFilmsDataBase)
+
         }
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.favoritesLayout,
@@ -80,6 +70,7 @@ class FavoriteFragment : Fragment() {
         // Setup Searching menu and icon
         onCreateSearchingMenu()
 
+        dataModelObserving()
     }
 
     // Function for using searching icon and view and changing data
@@ -93,8 +84,8 @@ class FavoriteFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                val newFavoriteDataList = viewModel.handleSearch(newText,favoriteFilmsDataBase)
-                updateDiffDataMovie(newFavoriteDataList)
+                val newFavoriteDataList = viewModel.handleSearch(newText, favoriteFilmList)
+                modelAdapter.updateItems(newFavoriteDataList)
                 return false
             }
         })
@@ -102,25 +93,18 @@ class FavoriteFragment : Fragment() {
 
     // Main movie Adapter Setup
     private fun movieAdapterSetup() {
-        movieAdapter = MovieAdapter(object : MovieAdapter.OnItemClickListener {
-            override fun click(movie: Movie, position: Int) {
-                //reaction to a click on a Recycler View element
-                utilityViewModel.chosenMovie.value = movie
-                utilityViewModel.chosenMoviePosition.value = filmsDataBase.indexOf(movie)
-                addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
-
-            }
-        })
         // create LayoutManager
         val layoutManagerMovie =
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         // create ItemDecoration for offset
         val movieItemsDecoration = MovieItemsDecoration(8)
         //setup Movie Adapter to our Recycler view
-        binding.rvMovieList.adapter = movieAdapter
-        binding.rvMovieList.layoutManager = layoutManagerMovie
-        binding.rvMovieList.addItemDecoration(movieItemsDecoration)
+        val rvMovieList = requireView().findViewById<RecyclerView>(R.id.rv_movie_list_fav)
+        rvMovieList.adapter = modelAdapter
+        rvMovieList.layoutManager = layoutManagerMovie
+        rvMovieList.addItemDecoration(movieItemsDecoration)
     }
+
 
     // TopAppBar Settings and click listener
     private fun topAppBarSetup() {
@@ -191,14 +175,6 @@ class FavoriteFragment : Fragment() {
     }
 
     // update data with DiffUtil
-    private fun updateDiffDataMovie(newData: ArrayList<Movie>) {
-        val oldData = movieAdapter.data
-        val movieDiff = DiffMovieAdapter(oldData, newData)
-        val diffResult = DiffUtil.calculateDiff(movieDiff)
-        movieAdapter.data = newData
-        diffResult.dispatchUpdatesTo(movieAdapter)
-    }
-
     private fun addFragment(fragment: Fragment, tag: String, container: Int) {
         val activity = requireActivity()
         activity.supportFragmentManager
@@ -208,4 +184,22 @@ class FavoriteFragment : Fragment() {
             .commit()
     }
 
+    private fun dataModelObserving() {
+        utilityViewModel.actualFilmList.observe(activity as LifecycleOwner) { list ->
+            actualFilmList = list
+            Timber.tag("Mylog").d("actualFilmListSize = ${actualFilmList.size}")
+
+        }
+        utilityViewModel.favoriteFilmList.observe(activity as LifecycleOwner) { list ->
+            favoriteFilmList = list
+            modelAdapter.updateItems(favoriteFilmList)
+        }
+    }
+
+    override fun onItemClick(film: Film) {
+        //reaction to a click on a Recycler View element
+        utilityViewModel.chosenFilm.value = film
+        utilityViewModel.chosenMoviePosition.value = actualFilmList.indexOf(film)
+        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
+    }
 }

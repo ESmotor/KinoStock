@@ -1,27 +1,30 @@
 package com.itskidan.kinostock.viewmodel
 
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.domain.Interactor
-import com.itskidan.kinostock.domain.Movie
+import com.itskidan.kinostock.domain.Film
 
 class FavoriteFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<ArrayList<Movie>>()
+
+    val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
 
     // Initializing the interactor
     var interactor: Interactor = App.instance.interactor
 
-    init {
-        val films = interactor.getFilmsDB()
-        filmsListLiveData.postValue(films)
+//    init {
+//        val films = interactor.getFilmsDB()
+//        filmsListLiveData.postValue(films)
+//    }
+
+    fun makeFavoriteFilmsDataBase(filmsDataBase: ArrayList<Film>): ArrayList<Film> {
+        return ArrayList(filmsDataBase.filter { movie -> movie.isInFavorites })
     }
 
-    fun makeFavoriteFilmsDataBase(filmsDataBase: ArrayList<Movie>): ArrayList<Movie> {
-        return ArrayList(filmsDataBase.filter { movie -> movie.isFavorite })
-    }
-
-    fun handleSearch(newText: String?, favoriteFilmsDataBase: ArrayList<Movie>): ArrayList<Movie> {
+    fun handleSearch(newText: String?, favoriteFilmsDataBase: ArrayList<Film>): ArrayList<Film> {
         return if (newText.isNullOrEmpty()) {
             favoriteFilmsDataBase
         } else {
@@ -30,7 +33,11 @@ class FavoriteFragmentViewModel : ViewModel() {
                     newText,
                     true
                 )
-            }.let { ArrayList<Movie>(it) }
+            }.let { ArrayList<Film>(it) }
         }
+    }
+
+    fun putNewData(list: ArrayList<Film>){
+        filmsListLiveData.postValue(list)
     }
 }
