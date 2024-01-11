@@ -12,14 +12,6 @@ class FavoriteFragmentViewModel : ViewModel() {
 
     val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
 
-    // Initializing the interactor
-    var interactor: Interactor = App.instance.interactor
-
-//    init {
-//        val films = interactor.getFilmsDB()
-//        filmsListLiveData.postValue(films)
-//    }
-
     fun makeFavoriteFilmsDataBase(filmsDataBase: ArrayList<Film>): ArrayList<Film> {
         return ArrayList(filmsDataBase.filter { movie -> movie.isInFavorites })
     }

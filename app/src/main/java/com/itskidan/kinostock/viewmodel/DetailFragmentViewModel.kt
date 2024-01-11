@@ -11,13 +11,13 @@ import com.itskidan.kinostock.domain.Film
 class DetailFragmentViewModel : ViewModel() {
     val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
 
-    // Initializing the interactor
-    var interactor: Interactor = App.instance.interactor
-
-    init {
-        val films = interactor.getFilmsDB()
-        filmsListLiveData.postValue(films)
-    }
+//    // Initializing the interactor
+//    var interactor: Interactor = App.instance.interactor
+//
+//    init {
+//        val films = interactor.getFilmsDB()
+//        filmsListLiveData.postValue(films)
+//    }
 
     fun onShareClick(context: Context, film: Film) {
         //Create an intent
