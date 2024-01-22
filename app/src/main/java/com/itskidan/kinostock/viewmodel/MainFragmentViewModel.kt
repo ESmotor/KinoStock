@@ -7,6 +7,7 @@ import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.Film
 import timber.log.Timber
+import javax.inject.Inject
 
 class MainFragmentViewModel : ViewModel() {
     val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
@@ -15,9 +16,11 @@ class MainFragmentViewModel : ViewModel() {
     var currentPage = 1
 
     // Initializing the interactor
-    var interactor: Interactor = App.instance.interactor
+    @Inject
+    lateinit var interactor: Interactor
 
     init {
+        App.instance.dagger.inject(this)
         interactor.getFilmsFromApi(page = 1, callback = object : ApiCallback {
             override fun onSuccess(films: ArrayList<Film>, page: Int, totalPages: Int) {
                 val newDataFilms = if (filmsListLiveData.value == null) {

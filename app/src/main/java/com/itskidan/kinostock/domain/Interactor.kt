@@ -8,9 +8,11 @@ import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class Interactor(private val repository: MainRepository, private val retrofitService: TmdbApi) {
+@Singleton
+class Interactor @Inject constructor(private val repository: MainRepository, private val retrofitService: TmdbApi) {
 
     // We will pass a callback from the view model to the constructor to react to when the movies
     // are received
