@@ -25,8 +25,14 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
                     response: Response<TmdbResultsDto>
                 ) {
                     // If successful, we call the method, pass onSuccess and a list of movies to this callback
+                    val filmsList = Converter.convertApiListToDtoList(response.body()?.tmdbFilms)
+                    // Put movies into the database
+                    filmsList.forEach {
+                        repository.putToDb(film = it)
+                    }
+
                     callback.onSuccess(
-                        films =Converter.convertApiListToDtoList(response.body()?.tmdbFilms),
+                        films =filmsList,
                         page = response.body()!!.page,
                         totalPages = response.body()!!.totalPages
                     )
@@ -39,5 +45,5 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
             })
     }
-    fun getFilmsDB(): ArrayList<Film> = repository.filmsDataBase
+    fun getFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB()
 }

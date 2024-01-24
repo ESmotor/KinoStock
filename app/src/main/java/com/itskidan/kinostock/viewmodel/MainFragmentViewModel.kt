@@ -69,7 +69,8 @@ class MainFragmentViewModel : ViewModel() {
             }
 
             override fun onFailure() {
-                Timber.tag("MyLog").d("Failure Load Data")
+                Timber.tag("MyLog").d("Failure: Load films from DataBase")
+                filmsListLiveData.postValue(interactor.getFilmsFromDB())
                 currentPage--
             }
         })
