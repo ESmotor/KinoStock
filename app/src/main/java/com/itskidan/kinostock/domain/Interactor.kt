@@ -2,12 +2,14 @@ package com.itskidan.kinostock.domain
 
 import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.TmdbResultsDto
+import com.itskidan.kinostock.data.database.DatabaseHelper
 import com.itskidan.kinostock.utils.API
 import com.itskidan.kinostock.utils.Converter
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,8 +29,10 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
                     // If successful, we call the method, pass onSuccess and a list of movies to this callback
                     val filmsList = Converter.convertApiListToDtoList(response.body()?.tmdbFilms)
                     // Put movies into the database
+                    Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
                     filmsList.forEach {
-                        repository.putToDb(film = it)
+                        repository.putToDb(film = it, tableName = DatabaseHelper.TABLE_NAME)
+
                     }
 
                     callback.onSuccess(
@@ -40,10 +44,12 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
                 override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
                     // In case of failure, another callback method is called
+                    Timber.tag("MyLog").d("Request failed with exception: ${t.message}")
                     callback.onFailure()
                 }
 
             })
     }
-    fun getFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB()
+    fun getFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB(DatabaseHelper.TABLE_NAME)
+    fun getFavoritesFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB(DatabaseHelper.TABLE_FAVORITES_NAME)
 }

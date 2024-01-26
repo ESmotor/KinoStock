@@ -1,11 +1,11 @@
 package com.itskidan.kinostock.viewmodel
 
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.domain.Interactor
+import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.domain.Interactor
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,9 +15,13 @@ class MainFragmentViewModel : ViewModel() {
     var totalPages = 1
     var currentPage = 1
 
+    @Inject
+    lateinit var repository: MainRepository
+
     // Initializing the interactor
     @Inject
     lateinit var interactor: Interactor
+
 
     init {
         App.instance.dagger.inject(this)
@@ -30,6 +34,7 @@ class MainFragmentViewModel : ViewModel() {
                 }
                 newDataFilms?.addAll(films)
                 Timber.tag("MyLog").d("newDataFilmsSize = ${newDataFilms?.size}")
+                repository.matchWithFavorites(filmsList = newDataFilms?:ArrayList())
                 filmsListLiveData.postValue(newDataFilms ?: ArrayList())
                 this@MainFragmentViewModel.totalPages = totalPages
                 Timber.tag("MyLog")
@@ -38,9 +43,12 @@ class MainFragmentViewModel : ViewModel() {
 
             override fun onFailure() {
                 Timber.tag("MyLog").d("Failure init data")
+                filmsListLiveData.postValue(interactor.getFilmsFromDB())
             }
-
         })
+
+        repository.matchWithFavorites(filmsList = filmsListLiveData.value?:ArrayList<Film>())
+
     }
 
     fun handleSearch(newText: String?): ArrayList<Film>? {
@@ -63,6 +71,7 @@ class MainFragmentViewModel : ViewModel() {
             override fun onSuccess(films: ArrayList<Film>, page: Int, totalPages: Int) {
                 val newDataFilms = filmsListLiveData.value
                 newDataFilms?.addAll(films)
+                repository.matchWithFavorites(filmsList = newDataFilms?: ArrayList())
                 filmsListLiveData.postValue(newDataFilms ?: ArrayList())
                 Timber.tag("MyLog")
                     .d("Success Load Data, ${films.size}, filmsListLiveDataSize = ${filmsListLiveData.value?.size} , page = $page")
@@ -70,11 +79,11 @@ class MainFragmentViewModel : ViewModel() {
 
             override fun onFailure() {
                 Timber.tag("MyLog").d("Failure: Load films from DataBase")
-                filmsListLiveData.postValue(interactor.getFilmsFromDB())
                 currentPage--
             }
         })
         isAllPagesLoaded = currentPage == totalPages
+
     }
 
     interface ApiCallback {

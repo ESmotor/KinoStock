@@ -12,10 +12,6 @@ class FavoriteFragmentViewModel : ViewModel() {
 
     val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
 
-    fun makeFavoriteFilmsDataBase(filmsDataBase: ArrayList<Film>): ArrayList<Film> {
-        return ArrayList(filmsDataBase.filter { movie -> movie.isInFavorites })
-    }
-
     fun handleSearch(newText: String?, favoriteFilmsDataBase: ArrayList<Film>): ArrayList<Film> {
         return if (newText.isNullOrEmpty()) {
             favoriteFilmsDataBase
@@ -29,7 +25,4 @@ class FavoriteFragmentViewModel : ViewModel() {
         }
     }
 
-    fun putNewData(list: ArrayList<Film>){
-        filmsListLiveData.postValue(list)
-    }
 }
