@@ -52,6 +52,7 @@ class MainFragment : Fragment(), OnItemClickListener {
     //private var isLoadingFilms = true
     private var currentFilm: Film? = null
     private var currentMoviePos: Int? = null
+    private var favoriteList = ArrayList<Film>()
 
     private var actualFilmList = ArrayList<Film>()
     override fun onCreateView(
@@ -69,6 +70,7 @@ class MainFragment : Fragment(), OnItemClickListener {
         viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Film>> {
             filmsDataBase = it
             utilityViewModel.actualFilmList.value = filmsDataBase
+            utilityViewModel.favoriteFilmList.value = ArrayList(filmsDataBase.filter { movie -> movie.isInFavorites })
             modelAdapter.updateItems(filmsDataBase)
             Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
             isLoading = false
@@ -240,6 +242,9 @@ class MainFragment : Fragment(), OnItemClickListener {
         }
         utilityViewModel.chosenFilm.observe(activity as LifecycleOwner) { movie ->
             currentFilm = movie
+        }
+        utilityViewModel.favoriteFilmList.observe(activity as LifecycleOwner) { favList ->
+            favoriteList = favList
         }
     }
 

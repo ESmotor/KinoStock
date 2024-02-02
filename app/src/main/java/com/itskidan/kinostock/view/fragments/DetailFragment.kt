@@ -20,19 +20,31 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.itskidan.kinostock.R
+import com.itskidan.kinostock.application.App
+import com.itskidan.kinostock.data.MainRepository
+import com.itskidan.kinostock.data.database.DatabaseHelper
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
 import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.utils.ApiConstants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.viewmodel.DetailFragmentViewModel
 import com.itskidan.kinostock.viewmodel.UtilityViewModel
 import timber.log.Timber
+import javax.inject.Inject
 import kotlin.math.abs
 
 
-class DetailFragment : Fragment() {
+class DetailFragment  : Fragment() {
     private lateinit var binding: FragmentDetailBinding
     private val utilityViewModel: UtilityViewModel by activityViewModels()
+    // Initializing the interactor
+    @Inject
+    lateinit var interactor: Interactor
+    @Inject
+    lateinit var repository: MainRepository
+
+
 
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(DetailFragmentViewModel::class.java)
@@ -54,6 +66,8 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        App.instance.dagger.inject(this)
 
         viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Film>> {
             filmsDataBase = it
@@ -163,19 +177,28 @@ class DetailFragment : Fragment() {
     }
 
     private fun onFavoriteClick() {
-
+        Timber.tag("MyLog").d("On method come ")
         val menu = binding.toolbar.menu
         val isFavoriteMenuItem = menu.findItem(R.id.isFavorite)
         if (chosenFilm != null && chosenFilm!!.isInFavorites) {
+            Timber.tag("MyLog").d("Step 1")
             chosenFilm!!.isInFavorites = false
             isFavoriteMenuItem.setIcon(R.drawable.ic_favorite_border_24)
             binding.fabFav.setImageResource(R.drawable.ic_favorite_border_24)
-            if (favoriteFilmList.contains(chosenFilm)) favoriteFilmList.remove(chosenFilm)
+            if (favoriteFilmList.contains(chosenFilm)) {
+                Timber.tag("MyLog").d("Step 2")
+                repository.deleteFromDb(chosenFilm!!,DatabaseHelper.TABLE_FAVORITES_NAME)
+                favoriteFilmList.remove(chosenFilm)
+            }
         } else if (chosenFilm != null && !(chosenFilm!!.isInFavorites)) {
+            Timber.tag("MyLog").d("Step 3")
             chosenFilm!!.isInFavorites = true
             isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
-            if (!(favoriteFilmList.contains(chosenFilm))) favoriteFilmList.add(chosenFilm!!)
+            if (!(favoriteFilmList.contains(chosenFilm))) {
+                repository.putToDb(chosenFilm!!,DatabaseHelper.TABLE_FAVORITES_NAME)
+                favoriteFilmList.add(chosenFilm!!)
+            }
         }
 
         utilityViewModel.favoriteFilmList.value = favoriteFilmList
