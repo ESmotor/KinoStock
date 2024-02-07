@@ -1,8 +1,9 @@
 package com.itskidan.kinostock.domain
 
+import androidx.lifecycle.LiveData
 import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.TmdbResultsDto
-import com.itskidan.kinostock.data.database.DatabaseHelper
+import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.utils.API
 import com.itskidan.kinostock.utils.Converter
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
@@ -30,10 +31,7 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
                     val filmsList = Converter.convertApiListToDtoList(response.body()?.tmdbFilms)
                     // Put movies into the database
                     Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
-                    filmsList.forEach {
-                        repository.putToDb(film = it, tableName = DatabaseHelper.TABLE_NAME)
-
-                    }
+                    repository.putToDB(filmsList)
 
                     callback.onSuccess(
                         films =filmsList,
@@ -50,6 +48,5 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
             })
     }
-    fun getFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB(DatabaseHelper.TABLE_NAME)
-    fun getFavoritesFilmsFromDB(): ArrayList<Film> = repository.getAllFromDB(DatabaseHelper.TABLE_FAVORITES_NAME)
+    fun getFilmsFromDB(): LiveData<List<Film>> = repository.getAllFromDB()
 }

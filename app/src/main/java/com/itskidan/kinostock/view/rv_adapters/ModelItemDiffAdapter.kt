@@ -2,7 +2,7 @@ package com.itskidan.myapplication
 
 import androidx.recyclerview.widget.DiffUtil
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 
 import com.itskidan.kinostock.domain.OnItemClickListener
 

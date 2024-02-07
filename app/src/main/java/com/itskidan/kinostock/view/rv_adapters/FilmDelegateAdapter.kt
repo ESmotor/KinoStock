@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.MovieListSampleViewBinding
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.utils.ApiConstants
 import com.itskidan.recyclerviewlesson.model.ModelItem

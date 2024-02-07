@@ -17,6 +17,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
@@ -71,4 +77,7 @@ dependencies {
     //dagger
     implementation ("com.google.dagger:dagger:2.43.2")
     kapt("com.google.dagger:dagger-compiler:2.43.2")
+    // Room
+    implementation ("androidx.room:room-runtime:2.6.0")
+    kapt ("androidx.room:room-compiler:2.6.0")
 }
