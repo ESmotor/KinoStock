@@ -2,8 +2,7 @@ package com.itskidan.kinostock.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.itskidan.kinostock.domain.Film
-import com.itskidan.recyclerviewlesson.model.ModelItem
+import com.itskidan.kinostock.data.entity.Film
 
 open class UtilityViewModel : ViewModel() {
     val chosenFilm: MutableLiveData<Film> by lazy {

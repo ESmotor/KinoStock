@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -17,8 +19,10 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
+import com.itskidan.kinostock.application.App
+import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.databinding.FragmentMainBinding
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.paging.PaginationScrollListener
 import com.itskidan.kinostock.utils.Constants
@@ -27,10 +31,14 @@ import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
 import com.itskidan.kinostock.viewmodel.UtilityViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
-import com.itskidan.recyclerviewlesson.model.ModelItem
 import timber.log.Timber
+import javax.inject.Inject
 
 class MainFragment : Fragment(), OnItemClickListener {
+
+
+    @Inject
+    lateinit var repository: MainRepository
 
     private lateinit var binding: FragmentMainBinding
     private var isLoading = false
@@ -55,6 +63,9 @@ class MainFragment : Fragment(), OnItemClickListener {
     private var favoriteList = ArrayList<Film>()
 
     private var actualFilmList = ArrayList<Film>()
+
+    private var isUpdated: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -66,19 +77,30 @@ class MainFragment : Fragment(), OnItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        App.instance.dagger.inject(this)
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
+            filmsDataBase = ArrayList(it)
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<ArrayList<Film>> {
-            filmsDataBase = it
+            if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
+                Timber.tag("MyLog").d("Loading from the API, clear database")
+                val notFavFilmList = filmsDataBase.filter { !it.isInFavorites }
+                repository.clearDB(ArrayList(notFavFilmList))
+                viewModel.getFilms()
+                isUpdated = !isUpdated
+            }
+            utilityViewModel.favoriteFilmList.value = viewModel.provideFavoriteFilmList(filmsDataBase)
             utilityViewModel.actualFilmList.value = filmsDataBase
-            utilityViewModel.favoriteFilmList.value = ArrayList(filmsDataBase.filter { movie -> movie.isInFavorites })
             modelAdapter.updateItems(filmsDataBase)
             Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
             isLoading = false
 
-
         })
-
-
+        viewModel.showProgressBar.observe(viewLifecycleOwner, Observer<Boolean> {
+            binding.progressBar.isVisible = it
+        })
+        viewModel.connectionProblemEvent.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(),it,Toast.LENGTH_SHORT).show()
+        }
         // create enter animation for fragments like CircularRevealAnimation
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.rootMainFragment,
@@ -145,7 +167,7 @@ class MainFragment : Fragment(), OnItemClickListener {
             PaginationScrollListener(binding.rvMovieList.layoutManager as LinearLayoutManager) {
             override fun loadMoreItems() {
                 isLoading = true
-                viewModel.fetchFilms()
+                viewModel.getFilms()
             }
 
             override fun isLastPage() = viewModel.isAllPagesLoaded

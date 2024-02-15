@@ -1,7 +1,7 @@
 package com.itskidan.kinostock.utils
 
 import com.itskidan.kinostock.data.TmdbFilm
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 
 object Converter {
     fun convertApiListToDtoList(list: List<TmdbFilm>?): ArrayList<Film> {
@@ -9,7 +9,7 @@ object Converter {
         list?.forEach {
             result.add(
                 Film(
-                    id = it.id,
+                    id = 0,
                     title = it.title,
                     poster = it.posterPath,
                     releaseDate = it.releaseDate,

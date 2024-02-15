@@ -1,12 +1,8 @@
 package com.itskidan.kinostock.viewmodel
 
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.domain.Interactor
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 
 class FavoriteFragmentViewModel : ViewModel() {
 

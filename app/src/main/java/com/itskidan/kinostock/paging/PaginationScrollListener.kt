@@ -13,7 +13,6 @@ abstract class PaginationScrollListener(private val layoutManager: LinearLayoutM
         val firstVisibleItemPosition: Int = layoutManager.findFirstVisibleItemPosition()
         val lastVisibleItem = layoutManager.findLastCompletelyVisibleItemPosition()
         val visibleThreshold = 3
-        Timber.tag("MyLog").d("totalItemCount = $totalItemCount, visibleItemCount = $visibleItemCount, firstVisibleItemPosition = $firstVisibleItemPosition")
         if (!isLoading() && !isLastPage()) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount){
                 loadMoreItems()

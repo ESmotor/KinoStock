@@ -22,9 +22,8 @@ import com.bumptech.glide.Glide
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.data.database.DatabaseHelper
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.utils.ApiConstants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
@@ -187,7 +186,7 @@ class DetailFragment  : Fragment() {
             binding.fabFav.setImageResource(R.drawable.ic_favorite_border_24)
             if (favoriteFilmList.contains(chosenFilm)) {
                 Timber.tag("MyLog").d("Step 2")
-                repository.deleteFromDb(chosenFilm!!,DatabaseHelper.TABLE_FAVORITES_NAME)
+                repository.removeFromFavoriteFilm(chosenFilm!!)
                 favoriteFilmList.remove(chosenFilm)
             }
         } else if (chosenFilm != null && !(chosenFilm!!.isInFavorites)) {
@@ -196,7 +195,7 @@ class DetailFragment  : Fragment() {
             isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)
             if (!(favoriteFilmList.contains(chosenFilm))) {
-                repository.putToDb(chosenFilm!!,DatabaseHelper.TABLE_FAVORITES_NAME)
+                repository.setAsFavoriteFilm(chosenFilm!!)
                 favoriteFilmList.add(chosenFilm!!)
             }
         }

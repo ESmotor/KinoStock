@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.domain.Interactor
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 
 class DetailFragmentViewModel : ViewModel() {
     val filmsListLiveData = MutableLiveData<ArrayList<Film>>()

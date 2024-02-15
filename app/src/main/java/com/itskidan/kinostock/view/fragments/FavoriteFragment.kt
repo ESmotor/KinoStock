@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
-import com.itskidan.kinostock.domain.Film
+import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
