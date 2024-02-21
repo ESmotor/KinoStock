@@ -1,12 +1,11 @@
 package com.itskidan.kinostock.domain
 
-import androidx.lifecycle.LiveData
 import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.TmdbResultsDto
 import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.utils.API
-import com.itskidan.kinostock.utils.Converter
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,6 +15,10 @@ import javax.inject.Singleton
 
 @Singleton
 class Interactor @Inject constructor(private val repository: MainRepository, private val retrofitService: TmdbApi) {
+
+
+
+
 
     // We will pass a callback from the view model to the constructor to react to when the movies
     // are received
@@ -28,7 +31,19 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
                     response: Response<TmdbResultsDto>
                 ) {
                     // If successful, we call the method, pass onSuccess and a list of movies to this callback
-                    val filmsList = Converter.convertApiListToDtoList(response.body()?.tmdbFilms)
+                    val tmdbFilmsList = response.body()?.tmdbFilms
+                    val filmsList = tmdbFilmsList?.map {
+                        Film(
+                            id = 0,
+                            title = it.title,
+                            poster = it.posterPath,
+                            releaseDate = it.releaseDate,
+                            description = it.overview,
+                            rating = it.voteAverage,
+                            isInFavorites = false
+                        )
+                    }?.let { ArrayList(it) } ?: ArrayList()
+
                     // Put movies into the database
                     Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
                     repository.putToDB(filmsList)
@@ -48,5 +63,6 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
             })
     }
-    fun getFilmsFromDB(): LiveData<List<Film>> = repository.getAllFromDB()
+    fun getFilmsFromDB(): Flow<List<Film>> = repository.getAllFromDB()
+
 }

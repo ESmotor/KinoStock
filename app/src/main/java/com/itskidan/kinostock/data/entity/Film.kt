@@ -21,5 +21,8 @@ data class Film(
     @ColumnInfo("vote_average") val rating: Double = 0.0,
     @ColumnInfo("date_of_release") val releaseDate: String,
     @ColumnInfo("is_favorite") var isInFavorites: Boolean
-) : Parcelable, ModelItem
-
+) : Parcelable, ModelItem{
+    override fun toString(): String {
+        return "Id:$id,Title:$title"
+    }
+}

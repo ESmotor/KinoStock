@@ -6,36 +6,55 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
-import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
+import com.itskidan.kinostock.application.App
+import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
+import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.FavoriteFragmentViewModel
-import com.itskidan.kinostock.viewmodel.UtilityViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
-import timber.log.Timber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 
 class FavoriteFragment : Fragment(), OnItemClickListener {
     private lateinit var binding: FragmentFavoriteBinding
     private val modelAdapter = ModelItemDiffAdapter(this)
 
+
+    @Inject
+    lateinit var repository: MainRepository
+
+    @Inject
+    lateinit var interactor: Interactor
+
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(FavoriteFragmentViewModel::class.java)
     }
 
-    private val utilityViewModel: UtilityViewModel by activityViewModels()
-    private var actualFilmList = ArrayList<Film>()
     private var favoriteFilmList = ArrayList<Film>()
+
+    private lateinit var sender: MutableSharedFlow<List<Film>>
+    private lateinit var receiver: SharedFlow<List<Film>>
+
+    lateinit var favoriteFragmentScope: CoroutineScope
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,15 +67,16 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        App.instance.dagger.inject(this)
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
+        favoriteFragmentScope = CoroutineScope(Dispatchers.Default)
 
-        }
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.favoritesLayout,
             requireActivity(),
             2
         )
+
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
         movieAdapterSetup()
@@ -70,7 +90,25 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
         // Setup Searching menu and icon
         onCreateSearchingMenu()
 
-        dataModelObserving()
+        receiveDatabase()
+    }
+
+
+    private fun receiveDatabase() {
+        sender = viewModel.sendersData
+        receiver = sender.asSharedFlow()
+
+        favoriteFragmentScope.launch(EmptyCoroutineContext) {
+            receiver.collect {
+                val favListFilm = it.filter { film -> film.isInFavorites }
+                favoriteFilmList = ArrayList(favListFilm)
+
+                withContext(Dispatchers.Main) {
+                    modelAdapter.updateItems(favoriteFilmList)
+                }
+
+            }
+        }
     }
 
     // Function for using searching icon and view and changing data
@@ -175,8 +213,15 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
     }
 
     // update data with DiffUtil
-    private fun addFragment(fragment: Fragment, tag: String, container: Int) {
+    private fun addFragment(fragment: Fragment, tag: String, container: Int, film: Film? = null) {
         val activity = requireActivity()
+        film?.let {
+            val bundle = Bundle().apply {
+                putParcelable("film", it)
+            }
+            fragment.arguments = bundle
+        }
+
         activity.supportFragmentManager
             .beginTransaction()
             .replace(container, fragment, tag)
@@ -184,22 +229,8 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
             .commit()
     }
 
-    private fun dataModelObserving() {
-        utilityViewModel.actualFilmList.observe(activity as LifecycleOwner) { list ->
-            actualFilmList = list
-            Timber.tag("Mylog").d("actualFilmListSize = ${actualFilmList.size}")
-
-        }
-        utilityViewModel.favoriteFilmList.observe(activity as LifecycleOwner) { list ->
-            favoriteFilmList = list
-            modelAdapter.updateItems(favoriteFilmList)
-        }
-    }
-
     override fun onItemClick(film: Film) {
         //reaction to a click on a Recycler View element
-        utilityViewModel.chosenFilm.value = film
-        utilityViewModel.chosenMoviePosition.value = actualFilmList.indexOf(film)
-        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
+        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain,film)
     }
 }

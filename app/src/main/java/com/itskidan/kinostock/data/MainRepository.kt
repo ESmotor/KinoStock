@@ -1,14 +1,14 @@
 package com.itskidan.kinostock.data
 
-import androidx.lifecycle.LiveData
 import com.itskidan.kinostock.data.dao.FilmDao
 import com.itskidan.kinostock.data.entity.Film
-import timber.log.Timber
+import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 @Singleton
 class MainRepository(private val filmDao: FilmDao) {
+
     fun putToDB(filmsList: ArrayList<Film>) {
         // Queries to the database must be in a separate thread
         Executors.newSingleThreadExecutor().execute {
@@ -16,11 +16,11 @@ class MainRepository(private val filmDao: FilmDao) {
         }
     }
 
-    fun getAllFromDB(): LiveData<List<Film>> {
+    fun getAllFromDB(): Flow<List<Film>> {
         return filmDao.getCachedFilms()
     }
 
-    fun clearDB(dataBase:ArrayList<Film>) {
+    fun clearDB(dataBase: ArrayList<Film>) {
         Executors.newSingleThreadExecutor().execute {
             filmDao.deleteFilmFromDB(dataBase)
         }
@@ -37,5 +37,6 @@ class MainRepository(private val filmDao: FilmDao) {
             filmDao.updateFilmFromDB(film)
         }
     }
+
 
 }

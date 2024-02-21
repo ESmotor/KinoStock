@@ -2,20 +2,24 @@ package com.itskidan.kinostock.viewmodel
 
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.MutableLiveData
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import com.itskidan.kinostock.data.entity.Film
+import java.net.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class DetailFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<ArrayList<Film>>()
 
-//    // Initializing the interactor
-//    var interactor: Interactor = App.instance.interactor
-//
-//    init {
-//        val films = interactor.getFilmsDB()
-//        filmsListLiveData.postValue(films)
-//    }
+
+    suspend fun loadWallpaper(url: String): Bitmap {
+        return suspendCoroutine {
+            val url = URL(url)
+            val bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+            it.resume(bitmap)
+        }
+    }
 
     fun onShareClick(context: Context, film: Film) {
         //Create an intent
