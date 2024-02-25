@@ -39,13 +39,6 @@
                     app:layout_collapseMode="parallax"
                     tools:src="@drawable/movie_slide1"/>
 
-<!--                <androidx.viewpager.widget.ViewPager-->
-<!--                    android:id="@+id/viewPagerContainer"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:fitsSystemWindows="true"-->
-<!--                    app:layout_collapseMode="parallax" />-->
-
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
@@ -125,10 +118,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="80dp"
-            android:contentDescription="@string/share_action"
+            android:contentDescription="@string/like_action"
             app:layout_anchor="@id/app_bar"
             app:layout_anchorGravity="bottom|end"
             app:srcCompat="@drawable/ic_favorite_border_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/details_fab_download_wp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="144dp"
+            android:contentDescription="@string/download_action"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_round_cloud_download_24"/>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:visibility="invisible"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:translationZ="10dp"
+            app:layout_anchor="@id/details_fab_download_wp"
+            app:layout_anchorGravity="center"
+            android:indeterminateTint="@color/white"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

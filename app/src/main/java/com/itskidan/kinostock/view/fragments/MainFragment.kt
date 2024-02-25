@@ -9,9 +9,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,18 +18,27 @@ import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.databinding.FragmentMainBinding
 import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.kinostock.databinding.FragmentMainBinding
+import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.paging.PaginationScrollListener
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
-import com.itskidan.kinostock.viewmodel.UtilityViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class MainFragment : Fragment(), OnItemClickListener {
 
@@ -40,32 +46,30 @@ class MainFragment : Fragment(), OnItemClickListener {
     @Inject
     lateinit var repository: MainRepository
 
+    @Inject
+    lateinit var interactor: Interactor
+
     private lateinit var binding: FragmentMainBinding
     private var isLoading = false
-    private val utilityViewModel: UtilityViewModel by activityViewModels()
     private val modelAdapter = ModelItemDiffAdapter(this)
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(MainFragmentViewModel::class.java)
     }
     private var filmsDataBase = ArrayList<Film>()
-//        //Используем backing field
+//        //Use backing field
 //        set(value) {
-//            //Если придет такое же значение, то мы выходим из метода
+//            //If the same value comes, then we exit the method
 //            if (field == value) return
-//            //Если пришло другое значение, то кладем его в переменную
+//            //If a different value arrives, then we put it in a variable
 //            field = value
 //            addData(field)
 //        }
 
-    //private var isLoadingFilms = true
-    private var currentFilm: Film? = null
-    private var currentMoviePos: Int? = null
-    private var favoriteList = ArrayList<Film>()
-
-    private var actualFilmList = ArrayList<Film>()
-
     private var isUpdated: Boolean = false
 
+    private lateinit var sender: MutableSharedFlow<List<Film>>
+    private lateinit var receiver: SharedFlow<List<Film>>
+    lateinit var mainFragmentScope: CoroutineScope
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,29 +82,22 @@ class MainFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         App.instance.dagger.inject(this)
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner, Observer<List<Film>> {
-            filmsDataBase = ArrayList(it)
 
-            if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
-                Timber.tag("MyLog").d("Loading from the API, clear database")
-                val notFavFilmList = filmsDataBase.filter { !it.isInFavorites }
-                repository.clearDB(ArrayList(notFavFilmList))
-                viewModel.getFilms()
-                isUpdated = !isUpdated
+        mainFragmentScope = CoroutineScope(Dispatchers.Default)
+
+        // checking whether the progress bar needs to be shown
+        mainFragmentScope.launch(EmptyCoroutineContext) {
+            for (element in viewModel.progressBarChannel) {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.isVisible = element
+                }
             }
-            utilityViewModel.favoriteFilmList.value = viewModel.provideFavoriteFilmList(filmsDataBase)
-            utilityViewModel.actualFilmList.value = filmsDataBase
-            modelAdapter.updateItems(filmsDataBase)
-            Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
-            isLoading = false
-
-        })
-        viewModel.showProgressBar.observe(viewLifecycleOwner, Observer<Boolean> {
-            binding.progressBar.isVisible = it
-        })
-        viewModel.connectionProblemEvent.observe(viewLifecycleOwner){
-            Toast.makeText(requireContext(),it,Toast.LENGTH_SHORT).show()
         }
+        // If there are problems with receiving data through the API, we display the message once
+        viewModel.connectionProblemEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
+
         // create enter animation for fragments like CircularRevealAnimation
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.rootMainFragment,
@@ -122,8 +119,39 @@ class MainFragment : Fragment(), OnItemClickListener {
         // Setup Searching menu and icon
         onCreateSearchingMenu()
 
-        // Observing requires data
-        dataModelObserving()
+
+        // observeReceiveData()
+        receiveDatabase()
+
+
+    }
+
+    private fun receiveDatabase() {
+        sender = viewModel.flowForSendersData
+        receiver = sender.asSharedFlow()
+        mainFragmentScope.launch(EmptyCoroutineContext) {
+            receiver.collect {
+                filmsDataBase = ArrayList(it)
+
+                if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
+                    Timber.tag("MyLog").d("Loading from the API, clear database")
+                    val notFavFilmList = filmsDataBase.filter { film ->
+                        !film.isInFavorites
+                    }
+                    repository.clearDB(ArrayList(notFavFilmList))
+                    viewModel.getFilms()
+                    isUpdated = !isUpdated
+                }
+
+                withContext(Dispatchers.Main) {
+                    modelAdapter.updateItems(filmsDataBase)
+                }
+
+                Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
+                isLoading = false
+
+            }
+        }
     }
 
     // Function for using searching icon and view and changing data
@@ -138,10 +166,8 @@ class MainFragment : Fragment(), OnItemClickListener {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                val newDataList = viewModel.handleSearch(newText)
-                if (newDataList != null) {
-                    modelAdapter.updateItems(newDataList)
-                }
+                val newDataList = viewModel.handleSearch(filmsDataBase, newText)
+                modelAdapter.updateItems(newDataList)
                 return false
             }
         })
@@ -246,10 +272,16 @@ class MainFragment : Fragment(), OnItemClickListener {
         }
     }
 
-
     // Function for adding fragments
-    private fun addFragment(fragment: Fragment, tag: String, container: Int) {
+    private fun addFragment(fragment: Fragment, tag: String, container: Int, film: Film? = null) {
         val activity = requireActivity()
+        film?.let {
+            val bundle = Bundle().apply {
+                putParcelable("film", it)
+            }
+            fragment.arguments = bundle
+        }
+
         activity.supportFragmentManager
             .beginTransaction()
             .replace(container, fragment, tag)
@@ -257,24 +289,9 @@ class MainFragment : Fragment(), OnItemClickListener {
             .commit()
     }
 
-    // Function for observing of data which was changed in other fragments
-    private fun dataModelObserving() {
-        utilityViewModel.chosenMoviePosition.observe(activity as LifecycleOwner) { position ->
-            currentMoviePos = position
-        }
-        utilityViewModel.chosenFilm.observe(activity as LifecycleOwner) { movie ->
-            currentFilm = movie
-        }
-        utilityViewModel.favoriteFilmList.observe(activity as LifecycleOwner) { favList ->
-            favoriteList = favList
-        }
-    }
-
     override fun onItemClick(film: Film) {
         //reaction to a click on a Recycler View element
-        utilityViewModel.chosenFilm.value = film
-        utilityViewModel.chosenMoviePosition.value = filmsDataBase.indexOf(film)
-        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain)
+        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain,film)
     }
 
 }

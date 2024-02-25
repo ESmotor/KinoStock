@@ -1,7 +1,5 @@
 package com.itskidan.kinostock.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
@@ -9,22 +7,22 @@ import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.SingleLiveEvent
 import com.itskidan.kinostock.utils.Constants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class MainFragmentViewModel : ViewModel() {
-    val showProgressBar: MutableLiveData<Boolean> = MutableLiveData()
-    val filmsListLiveData: LiveData<List<Film>>
+    val progressBarChannel = Channel<Boolean>(Channel.CONFLATED)
     var isAllPagesLoaded = false
     var totalPages = 1
     var currentPage = 1
     val connectionProblemEvent = SingleLiveEvent<String>()
+    var flowForSendersData = MutableSharedFlow<List<Film>>()
 
     @Inject
     lateinit var repository: MainRepository
@@ -36,26 +34,34 @@ class MainFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListLiveData = interactor.getFilmsFromDB()
+
+        CoroutineScope(EmptyCoroutineContext).launch {
+            val databaseFromDB = interactor.getFilmsFromDB()
+            databaseFromDB.collect {
+                flowForSendersData.emit(it)
+            }
+        }
     }
 
-    fun handleSearch(newText: String?): ArrayList<Film>? {
-        val filmsDataBase = filmsListLiveData.value?.let { ArrayList(it) }
+    // function for searching films
+    fun handleSearch(filmsDataBase: ArrayList<Film>, newText: String?): ArrayList<Film> {
         return if (newText.isNullOrEmpty()) {
             filmsDataBase
         } else {
-            filmsDataBase?.filter {
+            filmsDataBase.filter {
                 it.title.contains(
                     newText,
                     true
                 )
-            }?.let { ArrayList(it) }
+            }.let { ArrayList(it) }
         }
     }
 
-    
+
     fun getFilms() {
-        showProgressBar.postValue(true)
+
+        isShowProgressBar(true)
+
         interactor.getFilmsFromApi(page = currentPage, callback = object : ApiCallback {
             override fun onSuccess(films: ArrayList<Film>, page: Int, totalPages: Int) {
                 Timber.tag("MyLog").d("Loading from the API")
@@ -67,21 +73,23 @@ class MainFragmentViewModel : ViewModel() {
                 isAllPagesLoaded = currentPage == totalPages
                 Timber.tag("MyLog")
                     .d("Current page out = $currentPage, from totalPage = $totalPages")
-                showProgressBar.postValue(false)
+                isShowProgressBar(false)
             }
 
             override fun onFailure() {
                 Timber.tag("MyLog").d("Failure init data, loading from the database")
                 postConnectionProblemEvent()
-                showProgressBar.postValue(false)
+                isShowProgressBar(false)
 
             }
         })
 
     }
 
-    fun provideFavoriteFilmList(filmsDataBase: ArrayList<Film>): ArrayList<Film> {
-        return ArrayList(filmsDataBase.filter { it.isInFavorites })
+    private fun isShowProgressBar(element: Boolean){
+        CoroutineScope(EmptyCoroutineContext).launch {
+            progressBarChannel.send(element)
+        }
     }
 
     fun isDatabaseUpdateTime(min: Long): Boolean {
