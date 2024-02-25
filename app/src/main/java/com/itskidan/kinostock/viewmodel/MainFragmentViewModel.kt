@@ -7,22 +7,21 @@ import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.SingleLiveEvent
 import com.itskidan.kinostock.utils.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.coroutines.EmptyCoroutineContext
 
 class MainFragmentViewModel : ViewModel() {
-    val progressBarChannel = Channel<Boolean>(Channel.CONFLATED)
+
+    val progressBarSubject = BehaviorSubject.create<Boolean>()
     var isAllPagesLoaded = false
     var totalPages = 1
     var currentPage = 1
     val connectionProblemEvent = SingleLiveEvent<String>()
-    var flowForSendersData = MutableSharedFlow<List<Film>>()
+
+    var databaseFromDB : Observable<List<Film>>
 
     @Inject
     lateinit var repository: MainRepository
@@ -34,13 +33,7 @@ class MainFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-
-        CoroutineScope(EmptyCoroutineContext).launch {
-            val databaseFromDB = interactor.getFilmsFromDB()
-            databaseFromDB.collect {
-                flowForSendersData.emit(it)
-            }
-        }
+        databaseFromDB = interactor.getFilmsFromDB()
     }
 
     // function for searching films
@@ -87,9 +80,7 @@ class MainFragmentViewModel : ViewModel() {
     }
 
     private fun isShowProgressBar(element: Boolean){
-        CoroutineScope(EmptyCoroutineContext).launch {
-            progressBarChannel.send(element)
-        }
+            progressBarSubject.onNext(element)
     }
 
     fun isDatabaseUpdateTime(min: Long): Boolean {

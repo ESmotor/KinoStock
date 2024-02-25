@@ -49,9 +49,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -78,11 +76,18 @@ dependencies {
     implementation ("com.google.dagger:dagger:2.43.2")
     kapt("com.google.dagger:dagger-compiler:2.43.2")
     // Room
-    implementation ("androidx.room:room-runtime:2.6.0")
-    implementation ("androidx.room:room-ktx:2.6.0")
-    kapt ("androidx.room:room-compiler:2.6.0")
+    implementation ("androidx.room:room-runtime:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+    implementation ("androidx.room:room-rxjava3:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-
+    // LifeCycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
+    // RxJava
+    implementation ("io.reactivex.rxjava3:rxandroid:3.0.0")
+    implementation ("io.reactivex.rxjava3:rxjava:3.0.0")
 }

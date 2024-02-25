@@ -20,25 +20,20 @@ import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.databinding.FragmentMainBinding
+import com.itskidan.kinostock.domain.AutoDisposable
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.OnItemClickListener
+import com.itskidan.kinostock.domain.addTo
 import com.itskidan.kinostock.paging.PaginationScrollListener
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.EmptyCoroutineContext
 
 class MainFragment : Fragment(), OnItemClickListener {
 
@@ -67,15 +62,16 @@ class MainFragment : Fragment(), OnItemClickListener {
 
     private var isUpdated: Boolean = false
 
-    private lateinit var sender: MutableSharedFlow<List<Film>>
-    private lateinit var receiver: SharedFlow<List<Film>>
-    lateinit var mainFragmentScope: CoroutineScope
+    //parameters for RxJava
+    private val autoDisposable = AutoDisposable()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment and make ViewBinding
         binding = FragmentMainBinding.inflate(inflater)
+        autoDisposable.bindTo(lifecycle)
         return binding.root
     }
 
@@ -83,16 +79,15 @@ class MainFragment : Fragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         App.instance.dagger.inject(this)
 
-        mainFragmentScope = CoroutineScope(Dispatchers.Default)
-
         // checking whether the progress bar needs to be shown
-        mainFragmentScope.launch(EmptyCoroutineContext) {
-            for (element in viewModel.progressBarChannel) {
-                withContext(Dispatchers.Main) {
-                    binding.progressBar.isVisible = element
-                }
-            }
-        }
+        viewModel.progressBarSubject
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result -> binding.progressBar.isVisible = result },
+                { error -> println("Error: ${error.localizedMessage}") }
+            ).addTo(autoDisposable)
+
         // If there are problems with receiving data through the API, we display the message once
         viewModel.connectionProblemEvent.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
@@ -119,40 +114,36 @@ class MainFragment : Fragment(), OnItemClickListener {
         // Setup Searching menu and icon
         onCreateSearchingMenu()
 
-
         // observeReceiveData()
-        receiveDatabase()
+        receiveDatabaseWithRxJava()
 
 
     }
 
-    private fun receiveDatabase() {
-        sender = viewModel.flowForSendersData
-        receiver = sender.asSharedFlow()
-        mainFragmentScope.launch(EmptyCoroutineContext) {
-            receiver.collect {
-                filmsDataBase = ArrayList(it)
+    private fun receiveDatabaseWithRxJava() {
 
-                if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
-                    Timber.tag("MyLog").d("Loading from the API, clear database")
-                    val notFavFilmList = filmsDataBase.filter { film ->
-                        !film.isInFavorites
-                    }
-                    repository.clearDB(ArrayList(notFavFilmList))
-                    viewModel.getFilms()
-                    isUpdated = !isUpdated
-                }
-
-                withContext(Dispatchers.Main) {
-                    modelAdapter.updateItems(filmsDataBase)
-                }
-
-                Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
-                isLoading = false
-
+        if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
+            Timber.tag("MyLog").d("Loading from the API, clear database")
+            val notFavFilmList = filmsDataBase.filter { film ->
+                !film.isInFavorites
             }
+            repository.clearDB(ArrayList(notFavFilmList))
+            viewModel.getFilms()
+            isUpdated = !isUpdated
         }
+
+        viewModel.databaseFromDB
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result -> modelAdapter.updateItems(ArrayList(result)) },
+                { error -> println("Error: ${error.localizedMessage}") }
+            ).addTo(autoDisposable)
+
+        Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
+        isLoading = false
     }
+
 
     // Function for using searching icon and view and changing data
     private fun onCreateSearchingMenu() {
@@ -291,7 +282,6 @@ class MainFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(film: Film) {
         //reaction to a click on a Recycler View element
-        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain,film)
+        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain, film)
     }
-
 }

@@ -7,13 +7,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.itskidan.kinostock.data.entity.Film
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Observable
 
 @Dao
 interface FilmDao {
     // We make a query on the entire table
     @Query("SELECT * FROM cached_films")
-    fun getCachedFilms(): Flow<List<Film>>
+    fun getCachedFilms(): Observable<List<Film>>
 
     // Put the list in the database, in case of a conflict, overwrite it
     @Insert(onConflict = OnConflictStrategy.IGNORE)

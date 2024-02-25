@@ -15,22 +15,19 @@ import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
+import com.itskidan.kinostock.domain.AutoDisposable
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.domain.OnItemClickListener
+import com.itskidan.kinostock.domain.addTo
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.FavoriteFragmentViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.EmptyCoroutineContext
 
 
 class FavoriteFragment : Fragment(), OnItemClickListener {
@@ -50,10 +47,8 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
 
     private var favoriteFilmList = ArrayList<Film>()
 
-    private lateinit var sender: MutableSharedFlow<List<Film>>
-    private lateinit var receiver: SharedFlow<List<Film>>
-
-    lateinit var favoriteFragmentScope: CoroutineScope
+    //parameters for RxJava
+    private val autoDisposable = AutoDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +56,7 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentFavoriteBinding.inflate(inflater)
+        autoDisposable.bindTo(lifecycle)
         return binding.root
     }
 
@@ -68,8 +64,6 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         App.instance.dagger.inject(this)
-
-        favoriteFragmentScope = CoroutineScope(Dispatchers.Default)
 
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.favoritesLayout,
@@ -90,26 +84,23 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
         // Setup Searching menu and icon
         onCreateSearchingMenu()
 
-        receiveDatabase()
+        receiveDatabaseWithRxJava()
     }
 
-
-    private fun receiveDatabase() {
-        sender = viewModel.sendersData
-        receiver = sender.asSharedFlow()
-
-        favoriteFragmentScope.launch(EmptyCoroutineContext) {
-            receiver.collect {
-                val favListFilm = it.filter { film -> film.isInFavorites }
-                favoriteFilmList = ArrayList(favListFilm)
-
-                withContext(Dispatchers.Main) {
-                    modelAdapter.updateItems(favoriteFilmList)
-                }
-
-            }
-        }
+    private fun receiveDatabaseWithRxJava() {
+        viewModel.databaseFromDB
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result ->
+                    val favListFilm = result.filter { film -> film.isInFavorites }
+                    modelAdapter.updateItems(ArrayList(favListFilm))
+                },
+                { error -> println("Error: ${error.localizedMessage}") }
+            ).addTo(autoDisposable)
+        Timber.tag("MyLog").d("FavDataSize = ${modelAdapter.items.size}")
     }
+
 
     // Function for using searching icon and view and changing data
     private fun onCreateSearchingMenu() {
@@ -231,6 +222,7 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
 
     override fun onItemClick(film: Film) {
         //reaction to a click on a Recycler View element
-        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain,film)
+        addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain, film)
     }
+
 }

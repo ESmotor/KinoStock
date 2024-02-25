@@ -2,7 +2,9 @@ package com.itskidan.kinostock.data
 
 import com.itskidan.kinostock.data.dao.FilmDao
 import com.itskidan.kinostock.data.entity.Film
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.Executors
 import javax.inject.Singleton
 
@@ -16,26 +18,32 @@ class MainRepository(private val filmDao: FilmDao) {
         }
     }
 
-    fun getAllFromDB(): Flow<List<Film>> {
+    fun getAllFromDB(): Observable<List<Film>> {
         return filmDao.getCachedFilms()
     }
 
     fun clearDB(dataBase: ArrayList<Film>) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromSingle<List<Film>> {
             filmDao.deleteFilmFromDB(dataBase)
         }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     fun setAsFavoriteFilm(film: Film) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromSingle<List<Film>> {
             filmDao.updateFilmFromDB(film)
         }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     fun removeFromFavoriteFilm(film: Film) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromSingle<List<Film>> {
             filmDao.updateFilmFromDB(film)
         }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
 

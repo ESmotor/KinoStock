@@ -4,7 +4,6 @@ import com.itskidan.kinostock.data.MainRepository
 import com.itskidan.kinostock.di.modules.DatabaseModule
 import com.itskidan.kinostock.di.modules.DomainModule
 import com.itskidan.kinostock.di.modules.RemoteModule
-import com.itskidan.kinostock.domain.TmdbApi
 import com.itskidan.kinostock.view.fragments.DetailFragment
 import com.itskidan.kinostock.view.fragments.FavoriteFragment
 import com.itskidan.kinostock.view.fragments.MainFragment
