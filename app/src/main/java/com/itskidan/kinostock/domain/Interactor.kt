@@ -5,7 +5,9 @@ import com.itskidan.kinostock.data.TmdbResultsDto
 import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.utils.API
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -14,11 +16,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Interactor @Inject constructor(private val repository: MainRepository, private val retrofitService: TmdbApi) {
-
-
-
-
+class Interactor @Inject constructor(
+    private val repository: MainRepository,
+    private val retrofitService: TmdbApi
+) {
 
     // We will pass a callback from the view model to the constructor to react to when the movies
     // are received
@@ -46,10 +47,14 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
                     // Put movies into the database
                     Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
-                    repository.putToDB(filmsList)
+                    Completable.fromSingle<List<Film>> {
+                        repository.putToDB(filmsList)
+                    }
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
 
                     callback.onSuccess(
-                        films =filmsList,
+                        films = filmsList,
                         page = response.body()!!.page,
                         totalPages = response.body()!!.totalPages
                     )
@@ -63,6 +68,7 @@ class Interactor @Inject constructor(private val repository: MainRepository, pri
 
             })
     }
-    fun getFilmsFromDB(): Flow<List<Film>> = repository.getAllFromDB()
+
+    fun getFilmsFromDB(): Observable<List<Film>> = repository.getAllFromDB()
 
 }

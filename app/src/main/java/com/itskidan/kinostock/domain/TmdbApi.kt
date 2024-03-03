@@ -4,7 +4,6 @@ import com.itskidan.kinostock.data.TmdbResultsDto
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
-import javax.inject.Inject
 
 interface TmdbApi {
     @GET("3/movie/popular")
