@@ -10,10 +10,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity(
-    tableName = "cached_films",
+    tableName = "favorites_cached_films",
     indices = [Index(value = ["title"], unique = true)]
 )
-data class Film(
+data class FavoritesFilm(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo("title") val title: String,
     @ColumnInfo("poster_path") var poster: String?,
@@ -21,7 +21,7 @@ data class Film(
     @ColumnInfo("vote_average") val rating: Double = 0.0,
     @ColumnInfo("date_of_release") val releaseDate: String,
     @ColumnInfo("is_favorite") var isInFavorites: Boolean
-) : Parcelable, ModelItem{
+) : Parcelable, ModelItem {
     init {
         // null checking
         if (poster == null) {

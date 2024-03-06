@@ -17,12 +17,12 @@ class FavoriteFragmentViewModel : ViewModel() {
     @Inject
     lateinit var interactor: Interactor
 
-    var databaseFromDB : Observable<List<Film>>
+    var databaseFromFavoriteDB : Observable<List<Film>>
 
 
     init {
         App.instance.dagger.inject(this)
-        databaseFromDB = interactor.getFilmsFromDB()
+        databaseFromFavoriteDB = interactor.getFavoritesFilmsFromDB()
     }
 
     fun handleSearch(newText: String?, favoriteFilmsDataBase: ArrayList<Film>): ArrayList<Film> {

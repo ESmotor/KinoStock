@@ -88,13 +88,13 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
     }
 
     private fun receiveDatabaseWithRxJava() {
-        viewModel.databaseFromDB
+        viewModel.databaseFromFavoriteDB
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
-                    val favListFilm = result.filter { film -> film.isInFavorites }
-                    modelAdapter.updateItems(ArrayList(favListFilm))
+                    favoriteFilmList = ArrayList(result)
+                    modelAdapter.updateItems(ArrayList(result))
                 },
                 { error -> println("Error: ${error.localizedMessage}") }
             ).addTo(autoDisposable)

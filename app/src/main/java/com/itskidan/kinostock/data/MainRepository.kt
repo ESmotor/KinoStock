@@ -2,6 +2,8 @@ package com.itskidan.kinostock.data
 
 import com.itskidan.kinostock.data.dao.FilmDao
 import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.kinostock.utils.Converter.toFavoritesFilm
+import com.itskidan.kinostock.utils.Converter.toFilm
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -14,17 +16,24 @@ class MainRepository(private val filmDao: FilmDao) {
     fun putToDB(filmsList: ArrayList<Film>) {
         // Queries to the database must be in a separate thread
         Executors.newSingleThreadExecutor().execute {
-            filmDao.insertAll(filmsList)
+            filmDao.insertFilmsListToCacheDB(filmsList)
         }
     }
 
-    fun getAllFromDB(): Observable<List<Film>> {
+    fun getFilmsFromDB(): Observable<List<Film>> {
         return filmDao.getCachedFilms()
     }
 
-    fun clearDB(dataBase: ArrayList<Film>) {
+    fun getFavoritesFilmsFromDB(): Observable<List<Film>> {
+        val result = filmDao.getCachedFavoritesFilms().map { favoritesList ->
+            favoritesList.map { it.toFilm() }
+        }
+        return result
+    }
+
+    fun clearDB() {
         Completable.fromSingle<List<Film>> {
-            filmDao.deleteFilmFromDB(dataBase)
+            filmDao.clearCachedFilms()
         }
             .subscribeOn(Schedulers.io())
             .subscribe()
@@ -32,7 +41,7 @@ class MainRepository(private val filmDao: FilmDao) {
 
     fun setAsFavoriteFilm(film: Film) {
         Completable.fromSingle<List<Film>> {
-            filmDao.updateFilmFromDB(film)
+            filmDao.insertFilmToFavoriteDB(film.toFavoritesFilm())
         }
             .subscribeOn(Schedulers.io())
             .subscribe()
@@ -40,11 +49,10 @@ class MainRepository(private val filmDao: FilmDao) {
 
     fun removeFromFavoriteFilm(film: Film) {
         Completable.fromSingle<List<Film>> {
-            filmDao.updateFilmFromDB(film)
+            filmDao.deleteFilmByTitleFromFavoriteDB(film.title)
         }
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
-
 
 }

@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
@@ -148,6 +149,7 @@ class DetailFragment : Fragment() {
     private fun putPoster() {
         Glide.with(this)
             .load(ApiConstants.IMAGES_URL + "w780" + chosenFilm.poster)
+            .apply(RequestOptions().placeholder(R.drawable.poster_error_404))
             .centerCrop()
             .into(binding.detailsPoster)
     }
@@ -346,18 +348,15 @@ class DetailFragment : Fragment() {
     }
 
     private fun onFavoriteClick() {
-        Timber.tag("MyLog").d("On method come ")
         val menu = binding.toolbar.menu
         val isFavoriteMenuItem = menu.findItem(R.id.isFavorite)
         if (chosenFilm.isInFavorites) {
-            Timber.tag("MyLog").d("Step 1")
             chosenFilm.isInFavorites = false
             isFavoriteMenuItem.setIcon(R.drawable.ic_favorite_border_24)
             binding.fabFav.setImageResource(R.drawable.ic_favorite_border_24)
             repository.removeFromFavoriteFilm(chosenFilm)
 
         } else {
-            Timber.tag("MyLog").d("Step 3")
             chosenFilm.isInFavorites = true
             isFavoriteMenuItem.setIcon(R.drawable.ic_round_favorite_24)
             binding.fabFav.setImageResource(R.drawable.ic_round_favorite_24)

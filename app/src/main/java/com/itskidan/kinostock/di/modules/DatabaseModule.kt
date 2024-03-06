@@ -36,6 +36,7 @@ class DatabaseModule {
             name = "film_db"
         ).build().filmDao()
 
+
     @Provides
     @Singleton
     fun provideRepository(filmDao: FilmDao) = MainRepository(filmDao)
