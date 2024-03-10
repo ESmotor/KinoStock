@@ -1,11 +1,10 @@
 package com.itskidan.kinostock.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import com.itskidan.kinostock.data.entity.FavoritesFilm
 import com.itskidan.kinostock.data.entity.Film
 import io.reactivex.rxjava3.core.Observable
 
@@ -14,14 +13,22 @@ interface FilmDao {
     // We make a query on the entire table
     @Query("SELECT * FROM cached_films")
     fun getCachedFilms(): Observable<List<Film>>
+    @Query("DELETE FROM cached_films")
+    fun clearCachedFilms()
 
     // Put the list in the database, in case of a conflict, overwrite it
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(list: ArrayList<Film>)
+    fun insertFilmsListToCacheDB(list: ArrayList<Film>)
 
-    @Delete
-    fun deleteFilmFromDB(filmList: List<Film>)
+    //methods for favorites_cached_films
+    @Query("SELECT * FROM favorites_cached_films")
+    fun getCachedFavoritesFilms(): Observable<List<FavoritesFilm>>
 
-    @Update
-    fun updateFilmFromDB(film: Film)
+    // Put the list in the database, in case of a conflict, overwrite it
+    @Query("DELETE FROM favorites_cached_films WHERE title = :title")
+    fun deleteFilmByTitleFromFavoriteDB(title: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertFilmToFavoriteDB(film: FavoritesFilm)
+
 }

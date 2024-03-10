@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.data.MainRepository
@@ -31,12 +30,15 @@ import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
 import com.itskidan.myapplication.ModelItemDiffAdapter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainFragment : Fragment(), OnItemClickListener {
 
+    private var isLoadingPaging = false
 
     @Inject
     lateinit var repository: MainRepository
@@ -51,7 +53,8 @@ class MainFragment : Fragment(), OnItemClickListener {
         ViewModelProvider.NewInstanceFactory().create(MainFragmentViewModel::class.java)
     }
     private var filmsDataBase = ArrayList<Film>()
-//        //Use backing field
+
+    //        //Use backing field
 //        set(value) {
 //            //If the same value comes, then we exit the method
 //            if (field == value) return
@@ -59,7 +62,7 @@ class MainFragment : Fragment(), OnItemClickListener {
 //            field = value
 //            addData(field)
 //        }
-
+    private var favoritesFilmsDataBase = listOf<Film>()
     private var isUpdated: Boolean = false
 
     //parameters for RxJava
@@ -79,12 +82,16 @@ class MainFragment : Fragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         App.instance.dagger.inject(this)
 
+
         // checking whether the progress bar needs to be shown
         viewModel.progressBarSubject
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { result -> binding.progressBar.isVisible = result },
+                { result ->
+                    isLoading = result
+                    binding.progressBar.isVisible = result
+                },
                 { error -> println("Error: ${error.localizedMessage}") }
             ).addTo(autoDisposable)
 
@@ -124,26 +131,42 @@ class MainFragment : Fragment(), OnItemClickListener {
 
         if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
             Timber.tag("MyLog").d("Loading from the API, clear database")
-            val notFavFilmList = filmsDataBase.filter { film ->
-                !film.isInFavorites
-            }
-            repository.clearDB(ArrayList(notFavFilmList))
-            viewModel.getFilms()
+            repository.clearDB()
+            viewModel.getFilms(isNextPage = false)
             isUpdated = !isUpdated
         }
 
+        viewModel.databaseFromFavoriteDB
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe(
+                { result ->
+                    favoritesFilmsDataBase = result
+                },
+                { error -> println("Error: ${error.localizedMessage}") }
+            ).addTo(autoDisposable)
+
         viewModel.databaseFromDB
+            .map { filmListDB ->
+                filmsDataBase = ArrayList(filmListDB)
+                val favFilmsTitles = favoritesFilmsDataBase.map { it.title }.toSet()
+                filmListDB.forEach { film ->
+                    film.isInFavorites = film.title in favFilmsTitles
+                }
+                filmListDB
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { result -> modelAdapter.updateItems(ArrayList(result)) },
+                { result ->
+                    modelAdapter.updateItems(ArrayList(result))
+                    isLoadingPaging = false
+                },
                 { error -> println("Error: ${error.localizedMessage}") }
             ).addTo(autoDisposable)
 
         Timber.tag("MyLog").d("dataSize = ${modelAdapter.items.size}")
-        isLoading = false
     }
-
 
     // Function for using searching icon and view and changing data
     private fun onCreateSearchingMenu() {
@@ -151,17 +174,25 @@ class MainFragment : Fragment(), OnItemClickListener {
         val menu = topToolbar.menu
         val menuItemSearch = menu.findItem(R.id.search)
         val searchView = menuItemSearch.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
+        Observable.create<String> {
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                val newDataList = viewModel.handleSearch(filmsDataBase, newText)
-                modelAdapter.updateItems(newDataList)
-                return false
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    it.onNext(newText ?: "")
+                    return false
+                }
+            })
+
+        }.debounce(2, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                viewModel.getFilms(it, isNextPage = false)
+            }.addTo(autoDisposable)
+
+
     }
 
     // Main movie Adapter Setup
@@ -183,8 +214,10 @@ class MainFragment : Fragment(), OnItemClickListener {
         binding.rvMovieList.addOnScrollListener(object :
             PaginationScrollListener(binding.rvMovieList.layoutManager as LinearLayoutManager) {
             override fun loadMoreItems() {
-                isLoading = true
-                viewModel.getFilms()
+                if (!isLoadingPaging) {
+                    isLoadingPaging = true
+                    viewModel.getFilms(isNextPage = true)
+                }
             }
 
             override fun isLastPage() = viewModel.isAllPagesLoaded
@@ -195,11 +228,10 @@ class MainFragment : Fragment(), OnItemClickListener {
 
     // TopAppBar Settings and click listener
     private fun topAppBarSetup() {
-        val topToolbar = requireView().findViewById<MaterialToolbar>(R.id.topToolbar)
-        topToolbar.setNavigationOnClickListener {
-            Snackbar.make(binding.rootMainFragment, "Navigation menu", Snackbar.LENGTH_SHORT).show()
+        binding.topToolbar.setNavigationOnClickListener {
+
         }
-        topToolbar.setOnMenuItemClickListener {
+        binding.topToolbar.setOnMenuItemClickListener {
             true
         }
     }

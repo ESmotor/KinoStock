@@ -63,7 +63,10 @@ dependencies {
     //Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.6.0")
+    implementation ("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
+    //Okhttp
     implementation ("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
     // Glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
@@ -90,4 +93,5 @@ dependencies {
     // RxJava
     implementation ("io.reactivex.rxjava3:rxandroid:3.0.0")
     implementation ("io.reactivex.rxjava3:rxjava:3.0.0")
+    implementation ("io.reactivex.rxjava3:rxkotlin:3.0.1")
 }

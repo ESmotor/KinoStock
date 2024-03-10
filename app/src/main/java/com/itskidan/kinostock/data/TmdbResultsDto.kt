@@ -10,5 +10,5 @@ data class TmdbResultsDto(
     @SerializedName("total_pages")
     val totalPages: Int,
     @SerializedName("total_results")
-    val totalesults: Int
+    val totaleResults: Int
 )
