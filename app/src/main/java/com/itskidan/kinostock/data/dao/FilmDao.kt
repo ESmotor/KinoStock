@@ -18,7 +18,7 @@ interface FilmDao {
 
     // Put the list in the database, in case of a conflict, overwrite it
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertFilmsListToCacheDB(list: ArrayList<Film>)
+    fun insertFilmsListToCacheDB(list: List<Film>)
 
     //methods for favorites_cached_films
     @Query("SELECT * FROM favorites_cached_films")

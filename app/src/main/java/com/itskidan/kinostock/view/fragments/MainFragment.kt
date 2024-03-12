@@ -84,7 +84,7 @@ class MainFragment : Fragment(), OnItemClickListener {
 
 
         // checking whether the progress bar needs to be shown
-        viewModel.progressBarSubject
+        interactor.progressBarState
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -96,7 +96,7 @@ class MainFragment : Fragment(), OnItemClickListener {
             ).addTo(autoDisposable)
 
         // If there are problems with receiving data through the API, we display the message once
-        viewModel.connectionProblemEvent.observe(viewLifecycleOwner) {
+        interactor.connectionProblemEvent.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
         }
 
@@ -132,7 +132,7 @@ class MainFragment : Fragment(), OnItemClickListener {
         if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
             Timber.tag("MyLog").d("Loading from the API, clear database")
             repository.clearDB()
-            viewModel.getFilms(isNextPage = false)
+            viewModel.getFilms(isNextPage = false, autoDisposable = autoDisposable)
             isUpdated = !isUpdated
         }
 
@@ -189,7 +189,7 @@ class MainFragment : Fragment(), OnItemClickListener {
         }.debounce(2, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                viewModel.getFilms(it, isNextPage = false)
+                viewModel.getFilms(it, isNextPage = false, autoDisposable = autoDisposable)
             }.addTo(autoDisposable)
 
 
@@ -216,11 +216,11 @@ class MainFragment : Fragment(), OnItemClickListener {
             override fun loadMoreItems() {
                 if (!isLoadingPaging) {
                     isLoadingPaging = true
-                    viewModel.getFilms(isNextPage = true)
+                    viewModel.getFilms(isNextPage = true, autoDisposable = autoDisposable)
                 }
             }
 
-            override fun isLastPage() = viewModel.isAllPagesLoaded
+            override fun isLastPage() = false
 
             override fun isLoading() = isLoading
         })

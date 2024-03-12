@@ -1,8 +1,6 @@
-package com.itskidan.kinostock.di.modules
+package com.itskidan.remote_module
 
-import com.itskidan.kinostock.BuildConfig
-import com.itskidan.kinostock.domain.TmdbApi
-import com.itskidan.kinostock.utils.ApiConstants
+import com.itskidan.remote_module.entity.ApiConstants
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 @Module(includes = [BindOkHttpClient::class, BindRetrofit::class])
 class RemoteModule {

@@ -13,11 +13,13 @@ import javax.inject.Singleton
 @Singleton
 class MainRepository(private val filmDao: FilmDao) {
 
-    fun putToDB(filmsList: ArrayList<Film>) {
+    fun putToDB(filmsList: List<Film>) {
         // Queries to the database must be in a separate thread
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromSingle<List<Film>> {
             filmDao.insertFilmsListToCacheDB(filmsList)
         }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     fun getFilmsFromDB(): Observable<List<Film>> {

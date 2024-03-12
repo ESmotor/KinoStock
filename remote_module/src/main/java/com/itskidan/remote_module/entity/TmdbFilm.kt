@@ -1,4 +1,4 @@
-package com.itskidan.kinostock.data
+package com.itskidan.remote_module.entity
 
 import com.google.gson.annotations.SerializedName
 

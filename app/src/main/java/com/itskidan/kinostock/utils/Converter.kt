@@ -2,6 +2,7 @@ package com.itskidan.kinostock.utils
 
 import com.itskidan.kinostock.data.entity.FavoritesFilm
 import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.remote_module.entity.TmdbFilm
 
 object Converter {
     fun Film.toFavoritesFilm(): FavoritesFilm {
@@ -26,5 +27,23 @@ object Converter {
             releaseDate = releaseDate,
             isInFavorites = isInFavorites
         )
+    }
+
+    fun convertApiListToDTOList(list: List<TmdbFilm>?): List<Film> {
+        val result = mutableListOf<Film>()
+        list?.forEach {
+            result.add(
+                Film(
+                    id = 0,
+                    title = it.title,
+                    poster = it.posterPath,
+                    releaseDate = it.releaseDate,
+                    description = it.overview,
+                    rating = it.voteAverage,
+                    isInFavorites = false
+                )
+            )
+        }
+        return result
     }
 }
