@@ -1,19 +1,19 @@
-package com.itskidan.kinostock.data.entity
+package com.itskidan.core_api.entity
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.itskidan.recyclerviewlesson.model.ModelItem
+import com.itskidan.core_api.domain.ModelItem
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity(
-    tableName = "favorites_cached_films",
+    tableName = "cached_films",
     indices = [Index(value = ["title"], unique = true)]
 )
-data class FavoritesFilm(
+data class Film(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo("title") val title: String,
     @ColumnInfo("poster_path") var poster: String?,

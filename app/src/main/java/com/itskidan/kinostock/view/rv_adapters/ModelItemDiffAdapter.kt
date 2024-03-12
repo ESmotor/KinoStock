@@ -1,12 +1,11 @@
-package com.itskidan.myapplication
+package com.itskidan.kinostock.view.rv_adapters
 
 import androidx.recyclerview.widget.DiffUtil
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
-import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.core_api.domain.ModelItem
+import com.itskidan.core_api.entity.Film
 
 import com.itskidan.kinostock.domain.OnItemClickListener
-
-import com.itskidan.recyclerviewlesson.model.ModelItem
 
 
 class ModelItemDiffAdapter(private val itemClickListener: OnItemClickListener) :

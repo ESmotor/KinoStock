@@ -1,11 +1,11 @@
-package com.itskidan.kinostock.data.dao
+package com.itskidan.core_api.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.itskidan.kinostock.data.entity.FavoritesFilm
-import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.core_api.entity.FavoritesFilm
+import com.itskidan.core_api.entity.Film
 import io.reactivex.rxjava3.core.Observable
 
 @Dao

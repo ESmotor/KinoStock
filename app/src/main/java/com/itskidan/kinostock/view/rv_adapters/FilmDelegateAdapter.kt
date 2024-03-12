@@ -1,4 +1,4 @@
-package com.itskidan.myapplication
+package com.itskidan.kinostock.view.rv_adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.hannesdorfmann.adapterdelegates4.AbsListItemAdapterDelegate
+import com.itskidan.core_api.domain.ModelItem
+import com.itskidan.core_api.entity.Film
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.databinding.MovieListSampleViewBinding
-import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.domain.OnItemClickListener
 import com.itskidan.kinostock.utils.ApiConstants
-import com.itskidan.recyclerviewlesson.model.ModelItem
 
 class FilmDelegateAdapter(private val itemClickListener: OnItemClickListener) :
     AbsListItemAdapterDelegate<Film, ModelItem, FilmDelegateAdapter.FilmViewHolder>() {

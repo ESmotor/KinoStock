@@ -1,8 +1,8 @@
 package com.itskidan.kinostock.domain
 
+import com.itskidan.core_api.entity.Film
+import com.itskidan.core_impl.MainRepository
 import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.Converter
 import com.itskidan.remote_module.entity.API

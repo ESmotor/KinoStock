@@ -109,4 +109,5 @@ dependencies {
 
     //Modules
     implementation(project(":remote_module"))
+    implementation(project(":core"))
 }

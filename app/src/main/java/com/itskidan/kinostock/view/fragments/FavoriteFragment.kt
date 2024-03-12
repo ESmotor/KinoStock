@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.core_api.entity.Film
+import com.itskidan.core_impl.MainRepository
 import com.itskidan.kinostock.databinding.FragmentFavoriteBinding
 import com.itskidan.kinostock.domain.AutoDisposable
 import com.itskidan.kinostock.domain.Interactor
@@ -23,7 +23,7 @@ import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
 import com.itskidan.kinostock.view.rv_adapters.MovieItemsDecoration
 import com.itskidan.kinostock.viewmodel.FavoriteFragmentViewModel
-import com.itskidan.myapplication.ModelItemDiffAdapter
+import com.itskidan.kinostock.view.rv_adapters.ModelItemDiffAdapter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import timber.log.Timber

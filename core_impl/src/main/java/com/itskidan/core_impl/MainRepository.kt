@@ -1,17 +1,18 @@
-package com.itskidan.kinostock.data
+package com.itskidan.core_impl
 
-import com.itskidan.kinostock.data.dao.FilmDao
-import com.itskidan.kinostock.data.entity.Film
-import com.itskidan.kinostock.utils.Converter.toFavoritesFilm
-import com.itskidan.kinostock.utils.Converter.toFilm
+import com.itskidan.core_api.dao.FilmDao
+import com.itskidan.core_api.entity.Film
+import com.itskidan.core_api.utils.Converter.toFavoritesFilm
+import com.itskidan.core_api.utils.Converter.toFilm
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.Executors
+import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class MainRepository(private val filmDao: FilmDao) {
+class MainRepository @Inject constructor(private val filmDao: FilmDao) {
 
     fun putToDB(filmsList: List<Film>) {
         // Queries to the database must be in a separate thread
