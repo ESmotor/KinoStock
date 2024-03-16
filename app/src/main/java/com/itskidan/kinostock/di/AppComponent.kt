@@ -1,23 +1,24 @@
 package com.itskidan.kinostock.di
 
-import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.di.modules.DatabaseModule
+import com.itskidan.core_api.AppProvider
+import com.itskidan.core_api.DatabaseProvider
+import com.itskidan.core_impl.MainRepository
 import com.itskidan.kinostock.di.modules.DomainModule
-import com.itskidan.kinostock.di.modules.RemoteModule
 import com.itskidan.kinostock.view.fragments.DetailFragment
 import com.itskidan.kinostock.view.fragments.FavoriteFragment
 import com.itskidan.kinostock.view.fragments.MainFragment
 import com.itskidan.kinostock.viewmodel.FavoriteFragmentViewModel
 import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
+import com.itskidan.remote_module.RemoteProvider
 import dagger.Component
 import javax.inject.Singleton
 
+
 @Singleton
 @Component(
+    dependencies = [RemoteProvider::class, DatabaseProvider::class, AppProvider::class],
     modules = [
-        RemoteModule::class,
         DomainModule::class,
-        DatabaseModule::class
     ]
 )
 interface AppComponent {

@@ -1,8 +1,8 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-parcelize")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.kotlin)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -49,49 +49,65 @@ android {
 }
 
 dependencies {
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.gridlayout:gridlayout:1.0.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation ("com.airbnb.android:lottie:6.1.0")
+    implementation(libs.fragment.ktx)
+    implementation(libs.recyclerview)
+    implementation(libs.core.ktx)
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
+    implementation(libs.gridlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+
+    //Lottie
+    implementation (libs.lottie)
+
     //Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.6.0")
-    implementation ("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
+    implementation (libs.retrofit2)
+    implementation (libs.retrofit2.converter.gson)
+
     //Okhttp
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation (libs.okhttp3.logging.interceptor)
 
     // Glide
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation (libs.glide)
+    annotationProcessor (libs.glide.compiler)
+
     // paging
-    implementation ("androidx.paging:paging-runtime:3.2.1")
-    implementation ("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation (libs.paging.runtime)
+    implementation (libs.paging.runtime.ktx)
+
     // delegate
-    implementation( "com.hannesdorfmann:adapterdelegates4-kotlin-dsl-viewbinding:4.3.2")
+    implementation( libs.adapterdelegates4.kotlin.dsl.viewbinding)
+
     //dagger
-    implementation ("com.google.dagger:dagger:2.43.2")
-    kapt("com.google.dagger:dagger-compiler:2.43.2")
+    implementation (libs.dagger)
+    kapt(libs.dagger.compiler)
+
     // Room
-    implementation ("androidx.room:room-runtime:2.6.1")
-    implementation ("androidx.room:room-ktx:2.6.1")
-    implementation ("androidx.room:room-rxjava3:2.6.1")
-    kapt ("androidx.room:room-compiler:2.6.1")
+    implementation (libs.room.runtime)
+    implementation (libs.room.ktx)
+    implementation (libs.room.rxjava3)
+    kapt (libs.room.compiler)
+
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation (libs.coroutines.core)
+    implementation (libs.coroutines.android)
+
     // LifeCycle
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation(libs.lifecycle.viewmodel.ktx)
+
     // Timber
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.timber)
+
     // RxJava
-    implementation ("io.reactivex.rxjava3:rxandroid:3.0.0")
-    implementation ("io.reactivex.rxjava3:rxjava:3.0.0")
-    implementation ("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation (libs.rxjava3.rxjava)
+    implementation (libs.rxjava3.rxandroid)
+    implementation (libs.rxjava3.rxkotlin)
+    implementation (libs.rxjava3.retrofit.adapter)
+
+    //Modules
+    implementation(project(":remote_module"))
+    implementation(project(":core"))
 }

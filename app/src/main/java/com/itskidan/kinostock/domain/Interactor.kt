@@ -1,76 +1,54 @@
 package com.itskidan.kinostock.domain
 
-import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.data.TmdbResultsDto
-import com.itskidan.kinostock.data.entity.FavoritesFilm
-import com.itskidan.kinostock.data.entity.Film
-import com.itskidan.kinostock.utils.API
-import com.itskidan.kinostock.viewmodel.MainFragmentViewModel
-import io.reactivex.rxjava3.core.Completable
+import com.itskidan.core_api.entity.Film
+import com.itskidan.core_impl.MainRepository
+import com.itskidan.kinostock.application.App
+import com.itskidan.kinostock.utils.Constants
+import com.itskidan.kinostock.utils.Converter
+import com.itskidan.remote_module.entity.API
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import timber.log.Timber
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 @Singleton
 class Interactor @Inject constructor(
     private val repository: MainRepository,
-    private val retrofitService: TmdbApi
+    private val retrofitService: com.itskidan.remote_module.TmdbApi
 ) {
+    var progressBarState: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    val connectionProblemEvent = SingleLiveEvent<String>()
 
     // We will pass a callback from the view model to the constructor to react to when the movies
     // are received
     // and the page to load (this is for pagination)
-    fun getFilmsFromApi(page: Int, callback: MainFragmentViewModel.ApiCallback) {
-        retrofitService.getFilms(apiKey = API.KEY, language = "en-US", page = page)
-            .enqueue(object : Callback<TmdbResultsDto> {
-                override fun onResponse(
-                    call: Call<TmdbResultsDto>,
-                    response: Response<TmdbResultsDto>
-                ) {
-                    // If successful, we call the method, pass onSuccess and a list of movies to this callback
-                    val tmdbFilmsList = response.body()?.tmdbFilms
-                    val filmsList = tmdbFilmsList?.map {
-                        Film(
-                            id = 0,
-                            title = it.title,
-                            poster = it.posterPath,
-                            releaseDate = it.releaseDate,
-                            description = it.overview,
-                            rating = it.voteAverage,
-                            isInFavorites = false
-                        )
-                    }?.let { ArrayList(it) } ?: ArrayList()
-
-                    // Put movies into the database
-                    Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
-                    Completable.fromSingle<List<Film>> {
-                        repository.putToDB(filmsList)
-                    }
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
-
-                    callback.onSuccess(
-                        films = filmsList,
-                        page = response.body()!!.page,
-                        totalPages = response.body()!!.totalPages
-                    )
+    fun getFilmsFromApi(page: Int, autoDisposable: AutoDisposable) {
+        retrofitService.getFilms(
+            apiKey = API.KEY,
+            language = "en-US",
+            page = page
+        )
+            .subscribeOn(Schedulers.io())
+            .map {
+                Converter.convertApiListToDTOList(it.tmdbFilms)
+            }
+            .subscribeBy(
+                onError = {
+                    progressBarState.onNext(false)
+                    postConnectionProblemEvent()
+                },
+                onNext = {
+                    progressBarState.onNext(false)
+                    saveUpdateTimeDatabase()
+                    repository.putToDB(it)
                 }
-
-                override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
-                    // In case of failure, another callback method is called
-                    Timber.tag("MyLog").d("Request failed with exception: ${t.message}")
-                    callback.onFailure()
-                }
-
-            })
+            ).addTo(autoDisposable)
     }
 
-    fun searchFilmsFromApi(query: String, page: Int, callback: MainFragmentViewModel.ApiCallback) {
+    fun searchFilmsFromApi(query: String, page: Int, autoDisposable: AutoDisposable) {
         retrofitService.searchFilms(
             apiKey = API.KEY,
             query = query,
@@ -78,52 +56,38 @@ class Interactor @Inject constructor(
             language = "en-US",
             page = page
         )
-            .enqueue(object : Callback<TmdbResultsDto> {
-                override fun onResponse(
-                    call: Call<TmdbResultsDto>,
-                    response: Response<TmdbResultsDto>
-                ) {
-                    // If successful, we call the method, pass onSuccess and a list of movies to this callback
-                    Timber.tag("MyLog").d("I am here")
-                    val tmdbFilmsList = response.body()?.tmdbFilms
-                    val filmsList = tmdbFilmsList?.map {
-                        Film(
-                            id = 0,
-                            title = it.title,
-                            poster = it.posterPath,
-                            releaseDate = it.releaseDate,
-                            description = it.overview,
-                            rating = it.voteAverage,
-                            isInFavorites = false
-                        )
-                    }?.let { ArrayList(it) } ?: ArrayList()
-
-                    // Put movies into the database
-                    Timber.tag("MyLog").d("filmsListSize = ${filmsList.size}")
-                    Completable.fromSingle<List<Film>> {
-                        repository.putToDB(filmsList)
-                    }
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
-
-                    callback.onSuccess(
-                        films = filmsList,
-                        page = response.body()!!.page,
-                        totalPages = response.body()!!.totalPages
-                    )
+            .subscribeOn(Schedulers.io())
+            .map {
+                Converter.convertApiListToDTOList(it.tmdbFilms)
+            }
+            .subscribeBy(
+                onError = {
+                    progressBarState.onNext(false)
+                    postConnectionProblemEvent()
+                },
+                onNext = {
+                    progressBarState.onNext(false)
+                    saveUpdateTimeDatabase()
+                    repository.putToDB(it)
                 }
-
-                override fun onFailure(call: Call<TmdbResultsDto>, t: Throwable) {
-                    // In case of failure, another callback method is called
-                    Timber.tag("MyLog").d("Request failed with exception: ${t.message}")
-                    callback.onFailure()
-                }
-
-            })
+            ).addTo(autoDisposable)
     }
-
 
     fun getFilmsFromDB(): Observable<List<Film>> = repository.getFilmsFromDB()
     fun getFavoritesFilmsFromDB(): Observable<List<Film>> = repository.getFavoritesFilmsFromDB()
+
+    private fun saveUpdateTimeDatabase() {
+        App.instance.sharedPreferences
+            .edit()
+            .putLong(
+                Constants.LAST_UPDATE_TIME_DATABASE_KEY,
+                System.currentTimeMillis()
+            )
+            .apply()
+    }
+
+    private fun postConnectionProblemEvent() {
+        connectionProblemEvent.postValue(Constants.SERVER_CONNECTION_PROBLEM)
+    }
 
 }

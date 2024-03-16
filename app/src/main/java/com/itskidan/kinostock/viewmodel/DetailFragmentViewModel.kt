@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
-import com.itskidan.kinostock.data.entity.Film
+import com.itskidan.core_api.entity.Film
 import java.net.URL
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine

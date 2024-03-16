@@ -28,10 +28,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
+import com.itskidan.core_api.entity.Film
+import com.itskidan.core_impl.MainRepository
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
-import com.itskidan.kinostock.data.MainRepository
-import com.itskidan.kinostock.data.entity.Film
 import com.itskidan.kinostock.databinding.FragmentDetailBinding
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.utils.ApiConstants

@@ -15,4 +15,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "KinoStock"
 include(":app")
- 
+include(":remote_module")
+include(":core_api")
+include(":core_impl")
+include(":core")
