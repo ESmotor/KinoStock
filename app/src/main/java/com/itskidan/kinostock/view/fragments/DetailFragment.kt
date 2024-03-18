@@ -109,11 +109,18 @@ class DetailFragment : Fragment() {
         putPoster()
 
         // create enter animation for fragments like CircularRevealAnimation
-        EnterFragmentAnimation.performFragmentCircularRevealAnimation(
-            binding.detailLayout,
-            requireActivity(),
-            2
-        )
+        // Checking if the rootView is attached to the activity window
+        if (!binding.detailLayout.isAttachedToWindow) {
+            EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+                binding.detailLayout,
+                requireActivity(),
+                1
+            )
+        } else{
+            binding.detailLayout.visibility = View.VISIBLE
+        }
+
+
         // TopAppBar Setup
         setUpAppBarLayout()
         // Share floating bar click listener

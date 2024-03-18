@@ -23,10 +23,23 @@ class CollectionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        EnterFragmentAnimation.performFragmentCircularRevealAnimation(binding.rootCollectionsFragment, requireActivity(), 4)
+
+        // create enter animation for fragments like CircularRevealAnimation
+        // Checking if the rootView is attached to the activity window
+        if (!binding.rootCollectionsFragment.isAttachedToWindow) {
+            EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+                binding.rootCollectionsFragment,
+                requireActivity(),
+                1
+            )
+        } else{
+            binding.rootCollectionsFragment.visibility = View.VISIBLE
+        }
+
         // BottomNavigationBar setup
         bottomNavigationBarSetup()
     }
+
     // BottomNavigationBar Settings and click listener
     private fun bottomNavigationBarSetup() {
         binding.bottomNavigation.selectedItemId = R.id.collection
@@ -69,14 +82,7 @@ class CollectionsFragment : Fragment() {
                 }
 
                 R.id.collection -> {
-                    val fragment: Fragment? = requireActivity()
-                        .supportFragmentManager
-                        .findFragmentByTag(Constants.COLLECTIONS_FRAGMENT)
-                    addFragment(
-                        fragment ?: CollectionsFragment(),
-                        Constants.COLLECTIONS_FRAGMENT,
-                        R.id.fragmentContainerMain
-                    )
+
                     true
                 }
 

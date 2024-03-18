@@ -100,12 +100,6 @@ class MainFragment : Fragment(), OnItemClickListener {
             Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
         }
 
-        // create enter animation for fragments like CircularRevealAnimation
-        EnterFragmentAnimation.performFragmentCircularRevealAnimation(
-            binding.rootMainFragment,
-            requireActivity(),
-            1
-        )
 
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
@@ -124,9 +118,15 @@ class MainFragment : Fragment(), OnItemClickListener {
         // observeReceiveData()
         receiveDatabaseWithRxJava()
 
+        // create enter animation for fragments like CircularRevealAnimation
+        // Checking if the rootView is attached to the activity window
+        EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+            binding.rootMainFragment,
+            requireActivity(),
+            1
+        )
 
     }
-
     private fun receiveDatabaseWithRxJava() {
 
         if (!isUpdated && viewModel.isDatabaseUpdateTime(1)) {
@@ -159,6 +159,7 @@ class MainFragment : Fragment(), OnItemClickListener {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
+                    filmsDataBase = ArrayList(result)
                     modelAdapter.updateItems(ArrayList(result))
                     isLoadingPaging = false
                 },
@@ -243,14 +244,6 @@ class MainFragment : Fragment(), OnItemClickListener {
         botNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {
-                    val fragment: Fragment? = requireActivity()
-                        .supportFragmentManager
-                        .findFragmentByTag(Constants.MAIN_FRAGMENT)
-                    addFragment(
-                        fragment ?: MainFragment(),
-                        Constants.MAIN_FRAGMENT,
-                        R.id.fragmentContainerMain
-                    )
                     true
                 }
 
@@ -316,4 +309,5 @@ class MainFragment : Fragment(), OnItemClickListener {
         //reaction to a click on a Recycler View element
         addFragment(DetailFragment(), Constants.DETAIL_FRAGMENT, R.id.fragmentContainerMain, film)
     }
+
 }

@@ -1,5 +1,6 @@
 package com.itskidan.kinostock.view.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -65,12 +66,22 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
 
         App.instance.dagger.inject(this)
 
+        // create enter animation for fragments like CircularRevealAnimation
+        // Checking if the rootView is attached to the activity window
+//        if (!binding.favoritesLayout.isAttachedToWindow) {
+//            EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+//                binding.favoritesLayout,
+//                requireActivity(),
+//                1
+//            )
+//        } else{
+//            binding.favoritesLayout.visibility = View.VISIBLE
+//        }
         EnterFragmentAnimation.performFragmentCircularRevealAnimation(
             binding.favoritesLayout,
             requireActivity(),
-            2
+            1
         )
-
         // Movie List Recycler View
         // create main Movie Adapter with click listener on items
         movieAdapterSetup()
@@ -163,14 +174,6 @@ class FavoriteFragment : Fragment(), OnItemClickListener {
                 }
 
                 R.id.favorites -> {
-                    val fragment: Fragment? = requireActivity()
-                        .supportFragmentManager
-                        .findFragmentByTag(Constants.FAVORITE_FRAGMENT)
-                    addFragment(
-                        fragment ?: FavoriteFragment(),
-                        Constants.FAVORITE_FRAGMENT,
-                        R.id.fragmentContainerMain
-                    )
                     true
                 }
 

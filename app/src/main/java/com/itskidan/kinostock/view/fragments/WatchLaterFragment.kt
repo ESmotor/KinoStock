@@ -24,8 +24,18 @@ class WatchLaterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        EnterFragmentAnimation.performFragmentCircularRevealAnimation(binding.rootWatchLaterFragment, requireActivity(), 3)
 
+        // create enter animation for fragments like CircularRevealAnimation
+        // Checking if the rootView is attached to the activity window
+        if (!binding.rootWatchLaterFragment.isAttachedToWindow) {
+            EnterFragmentAnimation.performFragmentCircularRevealAnimation(
+                binding.rootWatchLaterFragment,
+                requireActivity(),
+                1
+            )
+        } else{
+            binding.rootWatchLaterFragment.visibility = View.VISIBLE
+        }
         // BottomNavigationBar setup
         bottomNavigationBarSetup()
     }
@@ -60,14 +70,7 @@ class WatchLaterFragment : Fragment() {
                 }
 
                 R.id.watch_later -> {
-                    val fragment: Fragment? = requireActivity()
-                        .supportFragmentManager
-                        .findFragmentByTag(Constants.WATCH_LATER_FRAGMENT)
-                    addFragment(
-                        fragment ?: WatchLaterFragment(),
-                        Constants.WATCH_LATER_FRAGMENT,
-                        R.id.fragmentContainerMain
-                    )
+
                     true
                 }
 
