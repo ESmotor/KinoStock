@@ -1,7 +1,14 @@
 package com.itskidan.kinostock.view
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.res.Configuration
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -14,12 +21,15 @@ import com.itskidan.kinostock.view.fragments.CollectionsFragment
 import com.itskidan.kinostock.view.fragments.FavoriteFragment
 import com.itskidan.kinostock.view.fragments.MainFragment
 import com.itskidan.kinostock.view.fragments.WatchLaterFragment
+import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val receiver = ReceiverForEvent()
+    private var currentFragment: Fragment? = Fragment()
 
-//    private val dataModel: UtilityViewModel by viewModels()
+    //    private val dataModel: UtilityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -31,8 +41,18 @@ class MainActivity : AppCompatActivity() {
         addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
         //setup fragments manager and settings
         fragmentManagerSetup()
+        // ReceiverForEvent
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_BATTERY_LOW)
+        filter.addAction(Intent.ACTION_POWER_CONNECTED)
+        registerReceiver(receiver, filter)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+
+    }
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
@@ -73,15 +93,20 @@ class MainActivity : AppCompatActivity() {
     // function to track changes in the fragment manager
     private fun fragmentManagerSetup() {
         supportFragmentManager.addOnBackStackChangedListener {
+            currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerMain)
+            Timber.tag("MyLog").d("currentFragment: ${currentFragment?.tag}")
             // In this block we will perform actions when changing the stack of fragments
-            when (supportFragmentManager.findFragmentById(R.id.fragmentContainerMain)) {
+
+            when (currentFragment) {
                 is MainFragment -> {
+                    Timber.tag("MyLog").d("MainFragment")
                     val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
                     val homeItem = botNavView.menu.findItem(R.id.home)
                     homeItem.isChecked = true
                 }
 
                 is FavoriteFragment -> {
+                    Timber.tag("MyLog").d("FavoriteFragment")
                     val botNavView = findViewById<BottomNavigationView>(R.id.bottomNavigation)
                     val favoriteItem = botNavView.menu.findItem(R.id.favorites)
                     favoriteItem.isChecked = true
@@ -99,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                     collectionsItem.isChecked = true
                 }
             }
+
         }
     }
 
@@ -108,6 +134,57 @@ class MainActivity : AppCompatActivity() {
             .replace(container, fragment, tag)
             .addToBackStack(tag)
             .commit()
+    }
+
+    inner class ReceiverForEvent : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            // check Intent not null
+            intent?.action?.let { action ->
+                // Determine which event occurred based on the action
+                when (action) {
+                    Intent.ACTION_BATTERY_LOW -> {
+                        // event low battery
+                        Toast.makeText(applicationContext, "LOW BATTERY", Toast.LENGTH_SHORT).show()
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+                    }
+
+                    Intent.ACTION_POWER_CONNECTED -> {
+                        // Event power connected
+                        Toast.makeText(applicationContext, "POWER CONNECTED", Toast.LENGTH_SHORT)
+                            .show()
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+                    //Add other actions as needed
+                }
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        recreateFragment()
+    }
+    private fun recreateFragment() {
+        if (currentFragment != null) {
+            when (currentFragment) {
+                is MainFragment -> {
+                    addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
+                }
+
+                is FavoriteFragment -> {
+                    addFragment(FavoriteFragment(), Constants.FAVORITE_FRAGMENT, R.id.fragmentContainerMain)
+                }
+
+                is WatchLaterFragment -> {
+                    addFragment(WatchLaterFragment(), Constants.WATCH_LATER_FRAGMENT, R.id.fragmentContainerMain)
+                }
+
+                is CollectionsFragment -> {
+                    addFragment(CollectionsFragment(), Constants.COLLECTIONS_FRAGMENT, R.id.fragmentContainerMain)
+                }
+            }
+        }
     }
 
 }

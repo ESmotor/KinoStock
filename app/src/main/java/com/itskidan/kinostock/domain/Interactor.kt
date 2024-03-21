@@ -5,6 +5,7 @@ import com.itskidan.core_impl.MainRepository
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.utils.Converter
+import com.itskidan.remote_module.TmdbApi
 import com.itskidan.remote_module.entity.API
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class Interactor @Inject constructor(
     private val repository: MainRepository,
-    private val retrofitService: com.itskidan.remote_module.TmdbApi
+    private val retrofitService: TmdbApi
 ) {
     var progressBarState: BehaviorSubject<Boolean> = BehaviorSubject.create()
     val connectionProblemEvent = SingleLiveEvent<String>()

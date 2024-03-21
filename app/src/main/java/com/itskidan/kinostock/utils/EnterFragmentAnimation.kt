@@ -1,5 +1,7 @@
 package com.itskidan.kinostock.utils
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -17,6 +19,7 @@ object EnterFragmentAnimation {
     //и объектом анимации
     //2 - активити для того, чтобы вернуть выполнение нового треда в UI поток
     //3 - позиция в меню навигации, чтобы круг проявления расходился именно от иконки меню навигации
+
     fun performFragmentCircularRevealAnimation(rootView: View, activity: Activity, position: Int) {
         //Создаем новый тред
         Executors.newSingleThreadExecutor().execute {
@@ -47,13 +50,8 @@ object EnterFragmentAnimation {
                     }
                     return@execute
                 }
-
-
             }
-
-
         }
-
-
     }
+
 }
