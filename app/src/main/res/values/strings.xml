@@ -31,6 +31,7 @@
     <string name="share_action" translatable="false">share action</string>
     <string name="like_action" translatable="false">like action</string>
     <string name="download_action" translatable="false">download action</string>
+    <string name="notification_action" translatable="false">notification action</string>
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 
     <!--Alert_Dialogs-->
@@ -138,5 +139,9 @@
     <string name="permission_storage" translatable="false">Нет разрешения. Пожалуйста, предоставьте разрешение</string>
     <string name="downloaded_to_gallery" translatable="false">"Сохранено в галерею"</string>
     <string name="open" translatable="false">В галерею</string>
+    <string name="channel_name" translatable="false">KiniStock Notifications</string>
+    <string name="channel_description" translatable="false">you can set up notifications for the KinoStok application</string>
+    <string name="title_notification">Movie Reminder</string>
+    <string name="message_notification">"Don't forget to watch the movie "</string>
 
 </resources>

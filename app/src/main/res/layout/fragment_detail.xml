@@ -62,7 +62,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginTop="15dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -132,7 +133,15 @@
             app:layout_anchor="@id/app_bar"
             app:layout_anchorGravity="bottom|end"
             app:srcCompat="@drawable/ic_round_cloud_download_24"/>
-
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/details_fab_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="208dp"
+            android:contentDescription="@string/notification_action"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_round_notification_add_24"/>
         <ProgressBar
             android:id="@+id/progress_bar"
             android:visibility="invisible"
