@@ -2,6 +2,7 @@ package com.itskidan.kinostock.view.fragments
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -36,6 +37,7 @@ import com.itskidan.kinostock.databinding.FragmentDetailBinding
 import com.itskidan.kinostock.domain.Interactor
 import com.itskidan.kinostock.utils.ApiConstants
 import com.itskidan.kinostock.utils.EnterFragmentAnimation
+import com.itskidan.kinostock.utils.NotificationHelper
 import com.itskidan.kinostock.viewmodel.DetailFragmentViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -116,7 +118,7 @@ class DetailFragment : Fragment() {
                 requireActivity(),
                 1
             )
-        } else{
+        } else {
             binding.detailLayout.visibility = View.VISIBLE
         }
 
@@ -133,13 +135,17 @@ class DetailFragment : Fragment() {
         }
         // Download floating button click listener
         binding.detailsFabDownloadWp.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= 33) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 checkPermission(Manifest.permission.READ_MEDIA_IMAGES)
             } else {
                 checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-
         }
+        // Notification
+        binding.detailsFabNotification.setOnClickListener {
+            checkPermission(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
     }
 
 
@@ -260,7 +266,10 @@ class DetailFragment : Fragment() {
                 nameOfPermission
             ) == PackageManager.PERMISSION_GRANTED -> {
                 Timber.tag("MyLog").d("The required permission is already available.")
-                performAsyncLoadOfPoster()
+                when (nameOfPermission) {
+                    Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.WRITE_EXTERNAL_STORAGE -> performAsyncLoadOfPoster()
+                    Manifest.permission.POST_NOTIFICATIONS -> postNotification(requireContext())
+                }
             }
 
             shouldShowRequestPermissionRationale(nameOfPermission) -> {
@@ -352,6 +361,10 @@ class DetailFragment : Fragment() {
 
     private fun String.handleSingleQuote(): String {
         return this.replace("'", "")
+    }
+
+    private fun postNotification(context: Context) {
+        NotificationHelper(context).showFilmNotification(chosenFilm)
     }
 
     private fun onFavoriteClick() {

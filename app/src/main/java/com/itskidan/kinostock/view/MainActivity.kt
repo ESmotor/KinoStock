@@ -13,11 +13,13 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.itskidan.core_api.entity.Film
 import com.itskidan.kinostock.R
 import com.itskidan.kinostock.application.App
 import com.itskidan.kinostock.databinding.ActivityMainBinding
 import com.itskidan.kinostock.utils.Constants
 import com.itskidan.kinostock.view.fragments.CollectionsFragment
+import com.itskidan.kinostock.view.fragments.DetailFragment
 import com.itskidan.kinostock.view.fragments.FavoriteFragment
 import com.itskidan.kinostock.view.fragments.MainFragment
 import com.itskidan.kinostock.view.fragments.WatchLaterFragment
@@ -34,11 +36,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //put the observer in the activity we need
-        lifecycle.addObserver(App.instance.lifecycleObserver)
 
         //add starting fragment
-        addFragment(MainFragment(), Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain)
+        val fragmentTag = intent?.getStringExtra(Constants.NOTIFICATION_FRAGMENT)
+        val film = intent?.getParcelableExtra<Film>(Constants.NOTIFICATION_FILM)
+
+        val fragment = if (fragmentTag == Constants.DETAIL_FRAGMENT && film != null) {
+            DetailFragment()
+        } else {
+            MainFragment()
+        }
+        addFragment(fragment, fragmentTag ?: Constants.MAIN_FRAGMENT, R.id.fragmentContainerMain, film)
+
+        //put the observer in the activity we need
+        lifecycle.addObserver(App.instance.lifecycleObserver)
         //setup fragments manager and settings
         fragmentManagerSetup()
         // ReceiverForEvent
@@ -128,7 +139,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addFragment(fragment: Fragment, tag: String, container: Int) {
+    private fun addFragment(fragment: Fragment, tag: String, container: Int, film: Film? = null) {
+        film?.let {
+            val bundle = Bundle().apply {
+                putParcelable("film", it)
+            }
+            fragment.arguments = bundle
+        }
+
         supportFragmentManager
             .beginTransaction()
             .replace(container, fragment, tag)
@@ -165,6 +183,7 @@ class MainActivity : AppCompatActivity() {
         super.onConfigurationChanged(newConfig)
         recreateFragment()
     }
+
     private fun recreateFragment() {
         if (currentFragment != null) {
             when (currentFragment) {
@@ -173,15 +192,27 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 is FavoriteFragment -> {
-                    addFragment(FavoriteFragment(), Constants.FAVORITE_FRAGMENT, R.id.fragmentContainerMain)
+                    addFragment(
+                        FavoriteFragment(),
+                        Constants.FAVORITE_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                 }
 
                 is WatchLaterFragment -> {
-                    addFragment(WatchLaterFragment(), Constants.WATCH_LATER_FRAGMENT, R.id.fragmentContainerMain)
+                    addFragment(
+                        WatchLaterFragment(),
+                        Constants.WATCH_LATER_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                 }
 
                 is CollectionsFragment -> {
-                    addFragment(CollectionsFragment(), Constants.COLLECTIONS_FRAGMENT, R.id.fragmentContainerMain)
+                    addFragment(
+                        CollectionsFragment(),
+                        Constants.COLLECTIONS_FRAGMENT,
+                        R.id.fragmentContainerMain
+                    )
                 }
             }
         }
